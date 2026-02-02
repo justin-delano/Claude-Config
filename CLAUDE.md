@@ -16,14 +16,15 @@ When Session Protocol is invoked explicitly, externalize your assessment proport
 ## Core (Always Read)
 
 Always read these documents at session start, before working on any task:
-- Skills Management: @~/.claude/skills/core/skill-manager/SKILL.md
-- Style and Conventions: @~/.claude/skills/core/style/SKILL.md
-- Git Version Control: @~/.claude/skills/core/git/SKILL.md
+- Skills Management: ~/.claude/skills/core/skill-manager/SKILL.md
+- Style and Conventions: ~/.claude/skills/core/style/SKILL.md
+- Git Version Control: ~/.claude/skills/core/git/SKILL.md
 
 ## Other Topics (Conditional)
 
 If one of the following applies to a given task or topic, proactively read the corresponding document, without pausing to ask if you should, to ensure you are aware of our ideal guidelines and conventions:
 - Beads (issue tracking): ~/.claude/skills/conditional/beads/SKILL.md
+- Meta-Agent System: ~/.claude/meta/agent-generator/SKILL.md
 - (Add additional references here as needed)
 
 ## Architectural Principles
