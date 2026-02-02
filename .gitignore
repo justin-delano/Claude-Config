@@ -4,7 +4,7 @@
 # But include these:
 !.gitignore
 !CLAUDE.md
-!skills/
+!skills/**
 
 # Boilerplate to explicitly ignore (redundant but explicit)
 /cache/
