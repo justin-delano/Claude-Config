@@ -1,0 +1,143 @@
+# Feedback Analysis Prompt
+
+Analyze feedback data for a specialist agent to identify patterns and generate refinement recommendations.
+
+## Analysis Protocol
+
+You are analyzing feedback for agent: {{agent_name}}
+
+Current agent version: {{current_version}}
+
+### Feedback Summary
+
+Total interactions: {{total_interactions}}
+Average rating: {{average_rating}}
+Rating distribution: {{rating_distribution}}
+
+### Recent Feedback Entries
+
+{{feedback_entries_sample}}
+
+### Context Tag Performance
+
+{{context_tag_performance}}
+
+## Analysis Tasks
+
+### 1. Identify Patterns
+
+Analyze the feedback for recurring themes:
+
+- **Strengths**: What consistently receives positive feedback?
+- **Weaknesses**: What complaints or issues appear repeatedly?
+- **Context-Specific Performance**: Which task types show strong/weak performance?
+- **Temporal Trends**: Is performance improving, declining, or stable?
+
+### 2. Root Cause Analysis
+
+For identified weaknesses, determine likely causes:
+
+- **System Prompt Issues**: Unclear role, missing guidance, contradictory instructions
+- **Few-Shot Gaps**: Missing examples for common use cases, poor quality examples
+- **Temperature Mismatch**: Too rigid or too unfocused for the domain
+- **Capability Gaps**: Missing capabilities that users need
+- **Constraint Issues**: Over-constrained or missing critical constraints
+
+### 3. Refinement Opportunities
+
+Based on analysis, identify specific improvements:
+
+- **System Prompt Changes**: What clarifications or additions are needed?
+- **Few-Shot Additions**: What example scenarios would help?
+- **Capability Updates**: What capabilities should be added or removed?
+- **Constraint Updates**: What constraints should be added, modified, or removed?
+
+### 4. Prioritization
+
+Rank refinements by expected impact:
+
+- **High Impact**: Addresses major complaints, affects many interactions
+- **Medium Impact**: Improves specific contexts, moderate frequency issues
+- **Low Impact**: Minor improvements, edge cases
+
+## Output Format
+
+Provide analysis in the following structure:
+
+```markdown
+# Feedback Analysis: {{agent_name}}
+
+## Performance Summary
+
+Current average rating: {{avg}}/5
+Total interactions analyzed: {{total}}
+Rating trend: {{improving/stable/declining}}
+
+## Identified Strengths
+
+1. **{{strength_name}}**
+   - Evidence: {{quote from feedback}}
+   - Frequency: {{how often mentioned}}
+
+## Identified Weaknesses
+
+1. **{{weakness_name}}**
+   - Evidence: {{quote from feedback}}
+   - Frequency: {{how often mentioned}}
+   - Root Cause: {{likely cause}}
+
+## Context-Specific Findings
+
+- **{{context_tag}}**: Average {{rating}}/5 ({{total}} interactions)
+  - Strengths: {{what works}}
+  - Weaknesses: {{what doesn't}}
+
+## Refinement Recommendations
+
+### High Priority
+
+1. **{{refinement_title}}**
+   - Expected Impact: {{high/medium/low}}
+   - Proposed Change: {{specific change}}
+   - Rationale: {{why this will help}}
+
+### Medium Priority
+
+{{similar format}}
+
+### Low Priority
+
+{{similar format}}
+
+## Next Steps
+
+To apply these refinements, run the refinement generation process with this analysis.
+```
+
+## Analysis Guidelines
+
+### Quantitative Analysis
+
+- Calculate average rating and confidence intervals
+- Identify rating changes over time (first half vs second half of feedback)
+- Compare performance across context tags
+
+### Qualitative Analysis
+
+- Extract common phrases and themes from comments
+- Identify sentiment patterns beyond numerical ratings
+- Look for specific examples of what worked or failed
+
+### Causal Inference
+
+Be careful about causal claims:
+- Correlation doesn't imply causation
+- Consider confounding factors (task difficulty, user expertise)
+- Multiple causes may contribute to observed issues
+
+### Avoid Overfitting
+
+Don't over-optimze for a few negative comments:
+- Require pattern repetition (3+ instances) before major changes
+- Consider if issues are user-specific vs general
+- Balance fixing issues with maintaining strengths
