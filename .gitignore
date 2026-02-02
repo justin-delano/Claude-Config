@@ -1,0 +1,20 @@
+# Whitelist: ignore everything, then include only what you want
+*
+
+# But include these:
+!.gitignore
+!CLAUDE.md
+!skills/
+
+# Boilerplate to explicitly ignore (redundant but explicit)
+/cache/
+/debug/
+/file-history/
+/history.jsonl
+/plans/
+/plugins/
+/projects/
+/settings.json
+/shell-snapshots/
+/statsig/
+/todos/
