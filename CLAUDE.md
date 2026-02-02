@@ -19,6 +19,7 @@ Always read these documents at session start, before working on any task:
 - Skills Management: ~/.claude/skills/core/skill-manager/SKILL.md
 - Style and Conventions: ~/.claude/skills/core/style/SKILL.md
 - Git Version Control: ~/.claude/skills/core/git/SKILL.md
+- Agent Selection: ~/.claude/skills/core/agent-selector/SKILL.md
 
 ## Other Topics (Conditional)
 
