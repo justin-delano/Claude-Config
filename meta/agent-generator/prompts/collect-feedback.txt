@@ -1,0 +1,113 @@
+# Feedback Collection Protocol
+
+After each interaction with a generated agent, collect structured feedback to enable refinement and improvement.
+
+## Feedback Prompt
+
+When collecting feedback, use the following prompt:
+
+```
+How was your interaction with the <agent-name> agent?
+
+Please provide:
+1. A rating from 1-5 on overall quality:
+   - 5: Excellent, exactly what I needed
+   - 4: Good, met most expectations
+   - 3: Acceptable, but room for improvement
+   - 2: Below expectations
+   - 1: Poor, did not help
+
+2. What worked well? (optional)
+
+3. What could be improved? (optional)
+
+4. What was the context or task type? (e.g., "literature review", "mechanism explanation", "experimental design")
+```
+
+## Feedback Entry Format
+
+Each feedback entry is a JSONL (JSON Lines) record appended to the agent's feedback file:
+
+```json
+{
+  "timestamp": "2026-02-02T16:15:00Z",
+  "rating": 5,
+  "comment": "Clear explanation with good citations",
+  "context_tags": ["explanation", "mechanism", "literature"]
+}
+```
+
+## Field Descriptions
+
+### timestamp
+- Format: ISO 8601 UTC timestamp
+- Purpose: Track when feedback was collected
+- Usage: Temporal analysis of performance trends
+
+### rating
+- Format: Integer 1-5
+- Purpose: Quantitative performance metric
+- Usage: Calculate average rating, identify low/high performers
+
+### comment
+- Format: String (optional)
+- Purpose: Qualitative feedback for refinement analysis
+- Usage: Extract patterns, identify specific issues or strengths
+
+### context_tags
+- Format: Array of strings
+- Purpose: Categorize interaction type
+- Usage: Analyze performance by task type
+- Common tags:
+  - `explanation` - Explaining a concept
+  - `analysis` - Analyzing data or information
+  - `literature` - Literature search or review
+  - `design` - Designing experiments or approaches
+  - `troubleshooting` - Problem-solving and debugging
+  - `creative` - Creative or brainstorming tasks
+
+## Feedback File Location
+
+Feedback is stored at:
+```
+~/.claude/agents/<agent-name>/feedback.jsonl
+```
+
+## Collection Methods
+
+### Automatic Collection
+
+After each agent interaction, the system can automatically prompt for feedback.
+
+### Manual Collection
+
+Users can submit feedback at any time using the format above.
+
+### Batch Collection
+
+For multiple past interactions, allow batch feedback entry with timestamps.
+
+## Feedback Analysis Triggers
+
+Trigger refinement analysis when:
+
+1. **Threshold Reached**: 10+ feedback entries accumulated
+2. **Performance Decline**: Average rating drops below 4.0
+3. **User Request**: User explicitly requests refinement
+4. **Periodic Review**: Scheduled analysis (e.g., monthly)
+
+## Privacy Considerations
+
+- Feedback files contain user comments and may contain sensitive information
+- Default: Store locally only, no cloud sync
+- Users can review, edit, or delete feedback entries
+- Aggregate analysis should not expose individual comments
+
+## Integration with Refinement
+
+Collected feedback feeds into the refinement process:
+
+1. **Pattern Analysis**: Identify common themes in comments
+2. **Tag-Based Analysis**: Compare performance across context tags
+3. **Rating Trends**: Track improvements or declines over time
+4. **Refinement Generation**: Propose targeted improvements based on findings
