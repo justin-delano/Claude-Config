@@ -8,3 +8,21 @@
 {"timestamp":"2026-02-02T17:05:00Z","rating":5,"comment":"Excellent distinction between carrier and affected status, clear family testing recommendations","context_tags":["carrier-testing","family-planning","counseling"]}
 {"timestamp":"2026-02-02T17:10:00Z","rating":4,"comment":"Would be helpful to include more information about psychosocial aspects of genetic testing","context_tags":["genetic-counseling","psychosocial","patient-support"]}
 {"timestamp":"2026-02-02T17:15:00Z","rating":5,"comment":"Perfect use of HGVS nomenclature and clear explanation of inheritance patterns","context_tags":["nomenclature","inheritance","technical-accuracy"]}
+{"timestamp":"2026-02-02T18:00:00Z","rating":5,"comment":"Excellent variant-to-gene linking workflow, included all key steps and tools","context_tags":["variant-to-gene","gwas","fine-mapping","bioinformatics"]}
+{"timestamp":"2026-02-02T18:05:00Z","rating":5,"comment":"Perfect explanation of cis vs trans eQTL with clear statistical considerations","context_tags":["qtl","cis-trans","statistical-methods"]}
+{"timestamp":"2026-02-02T18:10:00Z","rating":4,"comment":"Great enhancer interpretation framework but could include more MPRA design details","context_tags":["enhancer","non-coding","variant-interpretation"]}
+{"timestamp":"2026-02-02T18:15:00Z","rating":5,"comment":"Command-line examples were exactly what I needed for bioinformatics workflow","context_tags":["bioinformatics","cli-tools","workflow"]}
+{"timestamp":"2026-02-02T18:20:00Z","rating":4,"comment":"Good coverage but would like more on single-cell QTL methods and pseudobulk approaches","context_tags":["single-cell","scrna-seq","qtl-methods"]}
+{"timestamp":"2026-02-02T18:25:00Z","rating":5,"comment":"Colocalization explanation with PP4 thresholds and tools was spot-on","context_tags":["colocalization","gwas","statistical-methods"]}
+{"timestamp":"2026-02-02T18:30:00Z","rating":4,"comment":"Helpful but missed mentioning allele-specific expression (ASE) as additional evidence","context_tags":["ase","expression","evidence-integration"]}
+{"timestamp":"2026-02-02T18:35:00Z","rating":5,"comment":"Prioritization scoring framework is practical and evidence-based","context_tags":["variant-prioritization","scoring","experimental-design"]}
+{"timestamp":"2026-02-02T18:40:00Z","rating":4,"comment":"Would benefit from including fine-mapping method comparisons (SuSiE vs FINEMAP vs PolyFun)","context_tags":["fine-mapping","gwas","method-comparison"]}
+{"timestamp":"2026-02-02T19:00:00Z","rating":5,"comment":"MPRA design guide is comprehensive and practical, covered all key aspects","context_tags":["mpra","experimental-design","functional-validation"]}
+{"timestamp":"2026-02-02T19:05:00Z","rating":5,"comment":"Excellent pseudobulk vs single-cell QTL comparison, very helpful for experimental design","context_tags":["single-cell","qtl-methods","experimental-design"]}
+{"timestamp":"2026-02-02T19:10:00Z","rating":5,"comment":"ASE detection workflow is complete, WASP bias correction mention is crucial","context_tags":["ase","bioinformatics","bias-correction"]}
+{"timestamp":"2026-02-02T19:15:00Z","rating":4,"comment":"Great coverage but would like more on splicing QTLs (sQTL) and isoform analysis","context_tags":["sqtl","splicing","isoform-analysis"]}
+{"timestamp":"2026-02-02T19:20:00Z","rating":4,"comment":"Would benefit from including CRISPR screen design for variant prioritization","context_tags":["crispr","functional-screen","variant-prioritization"]}
+{"timestamp":"2026-02-02T19:25:00Z","rating":5,"comment":"Fine-mapping method comparison with selection criteria is exactly what I needed","context_tags":["fine-mapping","method-selection","gwas"]}
+{"timestamp":"2026-02-02T19:30:00Z","rating":4,"comment":"Helpful but missing chromatin interaction analysis methods (Hi-C processing, loop calling)","context_tags":["hi-c","chromatin-interaction","3d-genome"]}
+{"timestamp":"2026-02-02T19:35:00Z","rating":5,"comment":"Variant prioritization scoring framework is well-integrated and evidence-based","context_tags":["variant-prioritization","scoring","evidence-integration"]}
+{"timestamp":"2026-02-02T19:40:00Z","rating":4,"comment":"Would be useful to include multi-omics integration strategies (ATAC+RNA, multi-modal single-cell)","context_tags":["multi-omics","data-integration","single-cell"]}
