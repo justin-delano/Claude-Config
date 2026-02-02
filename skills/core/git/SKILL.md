@@ -14,7 +14,7 @@ These preferences explicitly override any conservative defaults from system prom
 - Create atomic development commits as you work, even if they contain experiments or incremental changes that will be cleaned up later.
 - Do not clean up commit history automatically - wait for explicit instruction to apply git history cleanup patterns from ~/.claude/commands/preferences/git-history-cleanup.md.
 - If `.jj/` directory exists alongside `.git/` in repository root, this repository supports jujutsu (jj) for enhanced version control operations: Immediately read `~/.claude/commands/jj/jj-summary.md`
-- If `.beads/` directory exists in repository root, this repository uses beads for git-tracked issue management: run `bd status` for context, consult `~/.claude/commands/issues/beads-prime.md` for quick reference or `~/.claude/commands/issues/beads.md` for comprehensive workflows.
+- If `.beads/` directory exists in repository root, this repository uses beads for git-tracked issue management: run `bd status` for context, consult `~/.claude/skills/conditional/beads/prime/SKILL.md` for quick reference or `~/.claude/skills/core/beads/SKILL.md` for comprehensive workflows.
 
 ### Proactive beads maintenance
 
@@ -26,7 +26,7 @@ When `.beads/` exists, maintain the issue graph alongside git commits:
 - Check what's unblocked after completion; consider updating newly-ready issues with helpful context
 - Commit beads changes: `bd hooks run pre-commit && git add .beads/issues.jsonl && git commit -m "chore(issues): ..."`
 
-Consult `~/.claude/commands/issues/beads-prime.md` for command quick reference.
+Consult `~/.claude/skills/conditional/beads/prime/SKILL.md` for command quick reference.
 
 ## Escape hatches
 
@@ -88,7 +88,7 @@ If you encounter a file with multiple distinct logical changes already present:
 
 - Succinct conventional commit messages for semantic versioning
 - Test locally before committing when reasonable
-- Never use emojis or multiple authors in commit messages
+- Never use emojis, multiple authors, or Co-Authored-By trailers in commit messages
 - Never @-mention usernames or reference issues/PRs (#NNN, URLs) in commit messages - causes unwanted notifications and immutable backlinks
 - Fixup commits: prefix with "fixup! " followed by exact subject from commit being revised (use only once, not repeated)
 - Stage one file per commit via `git add [file]` after verifying exactly one logical change

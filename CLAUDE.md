@@ -23,6 +23,7 @@ Always read these documents at session start, before working on any task:
 ## Other Topics (Conditional)
 
 If one of the following applies to a given task or topic, proactively read the corresponding document, without pausing to ask if you should, to ensure you are aware of our ideal guidelines and conventions:
+- Beads (issue tracking): ~/.claude/skills/conditional/beads/SKILL.md
 - (Add additional references here as needed)
 
 ## Architectural Principles
