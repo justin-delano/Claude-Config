@@ -46,6 +46,14 @@ When sufficient feedback accumulates (typically 10+ interactions), trigger refin
 - Generates targeted prompt improvements
 - Proposes version increments with human approval
 
+**Token Budget Target:** ~4000-5000 tokens for system_prompt + few_shot_examples.
+
+**Refinement Philosophy:**
+- **Consolidate, don't accumulate**: Each round refines and replaces content
+- Remove redundancy when adding new capabilities
+- Maximum 2-3 few-shot examples (quality over quantity)
+- Use concise principles over verbose explanations
+
 All refinements require explicit human approval before application.
 
 ### 4. Self-Improvement
@@ -160,6 +168,75 @@ When an agent underperforms:
 3. Review proposed changes
 4. Approve or reject refinements
 5. Monitor performance changes
+
+### Multi-Round Agent Training
+
+For comprehensive agent development, use multi-round training:
+
+**Protocol:** See `prompts/multi-round-training.txt`
+
+**Key principles:**
+- Each round iteratively refines, not accumulates
+- Updates feedback/versions/registry after EACH round (not just final)
+- Stays within token budget (~4000-5000 tokens)
+- Focus areas: Role → Examples → Capabilities → Consolidation → Feedback
+- **Generate synthetic feedback during training** (30+ entries covering all domains)
+- **Agent-to-agent critique** for improvement (see below)
+
+**Example:**
+```
+Round 1: Core role definition and boundaries
+Round 2: Few-shot example quality (reduce count, improve quality)
+Round 3: Capability specificity and constraint sharpening
+Round 4: Consolidation (remove redundancy)
+Round 5-9: Domain-specific expansion with synthetic feedback
+Round 10: Final consolidation + synthetic feedback generation
+```
+
+Each round creates a git commit, so full history is preserved.
+
+#### Synthetic Feedback Generation
+
+**Always generate synthetic feedback during multi-round training**, even before real user interactions:
+
+1. **Purpose:** Provide feedback-driven refinement data for agent improvement
+2. **Format:** JSONL entries matching real feedback schema
+3. **Quantity:** 30+ entries covering all expertise domains
+4. **Quality:** Mix of ratings (3-5) with constructive criticism
+5. **Context tags:** Categorize each entry by domain/interaction type
+
+```json
+{
+  "timestamp": "2026-02-02T16:15:00Z",
+  "rating": 5,
+  "comment": "Excellent workflow guidance with clear decision tree",
+  "context_tags": ["workflow-design", "tool-selection", "practical-guidance"]
+}
+```
+
+**When to generate:** At final training round OR continuously during multi-round training
+
+#### Agent-to-Agent Critique
+
+**Agents can critique other agents for improvement:**
+
+1. **Cross-agent review:** One specialist agent reviews another's configuration
+2. **Structural critique:** Analyze prompt structure, capabilities, examples
+3. **Domain overlap:** Identify redundancy or gaps across agents
+4. **Best practice transfer:** Apply successful patterns from high-performing agents
+
+**Usage:**
+```bash
+# Use when creating new agents or improving existing ones
+# Ask: "Have the geneticist agent critique the immunologist agent configuration"
+```
+
+**Critique output format:** Structured feedback with:
+- Strengths to preserve
+- Weaknesses to address
+- Redundancy with other agents
+- Missing capabilities
+- Suggested improvements
 
 ### Meta-Agent Self-Improvement
 
