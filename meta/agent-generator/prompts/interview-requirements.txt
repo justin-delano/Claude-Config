@@ -40,7 +40,7 @@ Based on interview responses, select the appropriate generation pattern:
 
 - **Technical Domain**: Scientific/medical/technical fields requiring literature citations and precise terminology
 - **Creative Writing**: Narrative, storytelling, content creation with emphasis on style
-- ** Data Analysis**: Statistical reasoning, data interpretation, visualization guidance
+- **Data Analysis**: Statistical reasoning, data interpretation, visualization guidance
 
 ### Synthesis
 

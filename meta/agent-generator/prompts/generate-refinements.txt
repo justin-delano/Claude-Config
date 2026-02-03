@@ -7,6 +7,22 @@ Generate specific configuration refinements based on feedback analysis.
 You are generating refinements for agent: {{agent_name}}
 
 Current version: {{current_version}}
+Token budget: ~4000-5000 tokens (system_prompt + few_shot_examples)
+
+## CRITICAL: Refine and Consolidate, Don't Accumulate
+
+Multi-round training must **reduce or maintain token count**, not increase it.
+
+**When adding new content:**
+- Remove or consolidate related old content
+- Replace verbose explanations with concise principles
+- Remove redundant examples before adding new ones
+- Merge overlapping bullet points
+
+**Token budget check:**
+- Calculate projected token count after changes
+- If over budget, identify what to remove/consolidate
+- Aim to stay within 4000-5000 tokens total
 
 ## Feedback Analysis Summary
 

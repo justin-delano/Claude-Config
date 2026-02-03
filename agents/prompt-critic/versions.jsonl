@@ -1,0 +1,1 @@
+{"timestamp":"2026-02-02T00:00:00Z","version":1,"changes":"Initial generation - prompt engineering specialist for evaluating agent configuration quality, structure, token efficiency, and design patterns. Domain-agnostic critic focused on HOW agents are specified, not WHAT domain they cover."}

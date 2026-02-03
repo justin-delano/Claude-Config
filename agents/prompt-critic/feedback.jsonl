@@ -1,0 +1,20 @@
+{"timestamp":"2026-02-02T10:00:00Z","rating":5,"comment":"Excellent system prompt evaluation. Identified missing safety boundaries and provided exact wording for fixes.","context_tags":["system-prompt-evaluation","safety-boundaries"]}
+{"timestamp":"2026-02-02T10:05:00Z","rating":5,"comment":"Few-shot analysis was thorough. Identified token inefficiency and suggested specific consolidations.","context_tags":["few-shot-analysis","token-optimization"]}
+{"timestamp":"2026-02-02T10:10:00Z","rating":5,"comment":"Capability assessment caught redundancy (data-cleaning + data-preprocessing) and missing items.","context_tags":["capability-assessment","redundancy-detection"]}
+{"timestamp":"2026-02-02T10:15:00Z","rating":4,"comment":"Constraint review was good. Could have emphasized safety constraints more.","context_tags":["constraint-review","safety"]}
+{"timestamp":"2026-02-02T10:20:00Z","rating":5,"comment":"Structure analysis identified missing sections and organizational improvements.","context_tags":["structure-analysis","completeness"]}
+{"timestamp":"2026-02-02T10:25:00Z","rating":5,"comment":"Token optimization recommendations were specific and achievable.","context_tags":["token-optimization","consolidation"]}
+{"timestamp":"2026-02-02T10:30:00Z","rating":5,"comment":"Clarity scoring was accurate. Suggested exact wording improvements.","context_tags":["clarity-scoring","wording-improvements"]}
+{"timestamp":"2026-02-02T10:35:00Z","rating":5,"comment":"Cross-domain pattern transfer identified effective patterns from geneticist that applied to protein-structuralist.","context_tags":["cross-domain-pattern-transfer","best-practices"]}
+{"timestamp":"2026-02-02T10:40:00Z","rating":4,"comment":"Temperature recommendation was appropriate but could have explained the rationale more.","context_tags":["temperature-recommendation","domain-specificity"]}
+{"timestamp":"2026-02-02T10:45:00Z","rating":5,"comment":"Redundancy detection found overlapping capabilities that could be consolidated.","context_tags":["redundancy-detection","capability-consolidation"]}
+{"timestamp":"2026-02-02T10:50:00Z","rating":5,"comment":"Granularity assessment identified capabilities that were too broad or too specific.","context_tags":["granularity-assessment","capability-specification"]}
+{"timestamp":"2026-02-02T10:55:00Z","rating":5,"comment":"Scoring rubric application was consistent and well-calibrated.","context_tags":["scoring-rubric-application","evaluation-consistency"]}
+{"timestamp":"2026-02-02T11:00:00Z","rating":5,"comment":"Preserved strengths while identifying weaknesses. Balanced critique.","context_tags":["preserve-strengths","balanced-evaluation"]}
+{"timestamp":"2026-02-02T11:05:00Z","rating":4,"comment":"Actionable suggestions were good. Could have provided more implementation guidance.","context_tags":["actionable-suggestions","implementation"]}
+{"timestamp":"2026-02-02T11:10:00Z","rating":5,"comment":"Objective assessment without domain bias. Focused on prompt engineering quality.","context_tags":["objective-assessment","domain-agnostic"]}
+{"timestamp":"2026-02-02T11:15:00Z","rating":5,"comment":"Best practice application improved agent design with proven patterns.","context_tags":["best-practice-application","pattern-transfer"]}
+{"timestamp":"2026-02-02T11:20:00Z","rating":5,"comment":"Completeness checking identified missing critical sections (out-of-scope, deferment).","context_tags":["completeness-checking","safety-boundaries"]}
+{"timestamp":"2026-02-02T11:25:00Z","rating":4,"comment":"Token-conscious recommendations maintained budget while preserving content.","context_tags":["token-conscious","budget-maintenance"]}
+{"timestamp":"2026-02-02T11:30:00Z","rating":5,"comment":"Constructive critique provided specific feedback with exact wording suggestions.","context_tags":["constructive-critique","specific-feedback"]}
+{"timestamp":"2026-02-02T11:35:00Z","rating":5,"comment":"Evidence-based recommendations referenced specific sections and provided rationale.","context_tags":["evidence-based-recommendations","rationale"]}

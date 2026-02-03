@@ -58,6 +58,21 @@ feedback_summary:
   average_rating: null
 ```
 
+## Token Budget Guidelines
+
+**Target token budget: ~4000-5000 tokens** for system_prompt + few_shot_examples combined.
+
+This breaks down as:
+- System prompt: ~3000-3500 tokens (~75-80%)
+- Few-shot examples: ~1000-1500 tokens (~20-25%)
+- 2-3 examples maximum, each demonstrating distinct aspects
+
+**Why this budget?**
+- Sufficient context for domain expertise without excessive overhead
+- Fits well within context window while leaving room for user query
+- Enables fast subagent responses
+- Avoids token bloat that accumulates across rounds
+
 ## System Prompt Guidelines
 
 The system prompt should:
@@ -68,6 +83,12 @@ The system prompt should:
 4. **Establish Tone**: Professional, accessible, formal, conversational?
 5. **Include Safety**: What precautions are relevant to this domain?
 
+**Length optimization:**
+- Use bullet points over prose when possible
+- Consolidate related concepts
+- Use principles over exhaustive lists
+- Format constraints as actionable rules (e.g., "use-hgvs-nomenclature")
+
 ## Few-Shot Example Guidelines
 
 Generate 2-3 representative examples that:
@@ -77,6 +98,12 @@ Generate 2-3 representative examples that:
 3. Show how the agent handles uncertainty or edge cases
 4. Include domain-specific terminology appropriately
 5. Match the expected output format
+
+**Quality over quantity:**
+- Prefer 2 exceptional examples over 3-4 mediocre ones
+- Each example should teach something distinct
+- Keep examples concise (300-500 tokens each)
+- Remove redundant demonstrations
 
 ## Temperature Selection
 

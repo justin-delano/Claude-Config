@@ -1,6 +1,8 @@
 # Agent Generator User Guide
 
-The Agent Generator is a meta-agent system that creates and improves specialist agents through human feedback loops.
+The Agent Generator is a meta-agent system that creates and improves specialist agents through **triangulated critique**—combining domain agent feedback, prompt engineering review, and real-world user feedback.
+
+Inspired by the Virtual Lab (Nature 2025), this system uses pure prompt engineering without model fine-tuning to continuously improve agent quality.
 
 ## Quick Start
 
@@ -19,25 +21,54 @@ The Agent Generator will conduct an interview to understand:
 
 After the interview, it generates an agent configuration for your approval.
 
-### Using Generated Agents
+### How Agents Improve
 
-Once created, agents are available at `~/.claude/agents/<agent-name>/` with:
+Once created, agents improve through **triangulated critique**:
 
-- `config.yaml` - Full agent configuration including system prompt
-- `feedback.jsonl` - Accumulated feedback data
-- `versions.jsonl` - Change history
+```
+Target Agent → Domain Critics + Prompt-Critic + User Feedback → Consensus → Refinement
+```
 
-### Providing Feedback
+| Source | What It Evaluates | Examples |
+|--------|-------------------|----------|
+| **Domain Agents** (2-3) | Domain coverage, terminology, capabilities | geneticist reviewing literature-review for genetics-specific capabilities |
+| **Prompt-Critic** (1) | Prompt structure, token efficiency, clarity | Identifying redundancies, suggesting consolidations |
+| **User Feedback** (∞) | Real-world performance, utility | Rating interactions, noting what worked/failed |
 
-After using an agent, provide structured feedback:
-
-"The agent provided a clear explanation but missed recent papers from 2024. Rating: 4/5."
-
-This feedback is automatically logged and used for future refinements.
+**Only act on strong consensus** (2+ sources agree) for major changes.
 
 ## Workflow Examples
 
-### Domain Expert Agent
+### Iterative Improvement with Triangulated Critique
+
+**Scenario:** literature-review agent v3 has 3.8/5.0 average rating
+
+**Domain Critics Say:**
+- geneticist: "Missing advanced search strategies for variant databases"
+- protein-structuralist: "No coverage of structural biology literature"
+
+**Prompt-Critic Says:**
+- "Few-shot examples too verbose (~800 tokens each, target 300-500)"
+- "Missing out-of-scope boundaries for medical advice"
+
+**User Feedback Shows:**
+- 4/5: "Great summaries, but can't find preprints efficiently"
+- 3/5: "Responses are long and detailed but sometimes miss key sources"
+
+**Consensus Analysis:**
+- **Strong consensus:** Verbose examples (Prompt-critic + users agree)
+- **Strong consensus:** Missing preprint guidance (geneticist + users)
+- **Moderate consensus:** Structural literature gap (only protein-structuralist)
+
+**Refinement Applied:**
+- Condense few-shot examples by 40% (-300 tokens)
+- Add bioRxiv/arXiv search strategies
+- Add "out-of-scope: medical advice" boundary
+- Add structural literature coverage in future round
+
+**Result:** v4 achieves 4.6/5.0 average rating
+
+### Creating New Agents
 
 **Request:** "Create a molecular biologist agent for CRISPR experimental design."
 
@@ -51,33 +82,137 @@ This feedback is automatically logged and used for future refinements.
 - Tailored to your organism
 - Outputs in your preferred format
 
-### Iterative Improvement
+**After Creation:**
+- Use agent for tasks
+- Provide feedback after each interaction
+- After 10+ feedback entries, request triangulated critique
 
-**Initial Performance:** Agent achieves 3.5/5 average rating.
+### Multi-Agent Collaboration
 
-**Common Feedback Themes:**
-- Protocols lack troubleshooting tips
-- Missing alternative approaches
-- Citations could be more comprehensive
+Agents can work together on complex tasks:
 
-**Refinement Applied:**
-- Added troubleshooting section to system prompt
-- Included "always suggest alternatives" constraint
-- Expanded few-shot examples with better citations
+```
+Research Question → literature-review (find papers)
+                    ↓
+                 geneticist (analyze variant data)
+                    ↓
+         protein-structuralist (model protein impact)
+                    ↓
+             prompt-critic (critique any agent's performance)
+```
 
-**Improved Performance:** Rating increases to 4.3/5.
+## Triangulated Critique System
+
+### How It Works
+
+1. **Collect Perspectives:**
+   - Domain agents review domain coverage
+   - Prompt-critic reviews design quality
+   - User feedback shows real-world performance
+
+2. **Build Consensus:**
+   - Strong consensus (2+ sources agree): ACT immediately
+   - Moderate consensus (1 source): EVALUATE
+   - Conflicting opinions: RESOLVE through framework
+
+3. **Generate Refinement:**
+   - Prioritize by support × impact × (1 - risk)
+   - Address high-priority items first
+   - Maintain token budget (4000-5000 tokens)
+
+4. **Human Approval:**
+   - Review proposed changes
+   - Approve, modify, or reject
+   - Apply and increment version
+
+### Conflict Resolution
+
+When sources disagree:
+
+| Conflict Type | Resolution |
+|---------------|------------|
+| Domain vs Design | Design quality takes precedence (foundation) |
+| User vs Experts | User preference wins (utility focus) |
+| Expert A vs Expert B | Prompt-critic breaks tie (design principles) |
+| **Any vs Safety** | **Safety always wins** (veto power) |
+
+### Available Critics
+
+```yaml
+Domain Agents:
+  - geneticist: Bioinformatics specialist
+  - protein-structuralist: Protein structure specialist
+  - literature-review: Academic literature specialist
+
+Meta-Critic:
+  - prompt-critic: Prompt engineering specialist (domain-agnostic)
+```
+
+## Best Practices
+
+1. **Provide Specific Feedback:** "Missing X capability" is more helpful than "not good enough"
+
+2. **Wait for Consensus:** Major changes require 2+ sources agreeing
+
+3. **Trust User Feedback:** Practical utility matters most
+
+4. **Let Prompt-Critic Optimize:** Token efficiency and structure are their expertise
+
+5. **Domain Experts Know Content:** Trust domain agents on what should be covered
+
+## Understanding Agent Quality
+
+### What Makes a Good Agent?
+
+**System Prompt (40% of quality):**
+- Clear role definition
+- Specific responsibilities
+- Explicit boundaries (out-of-scope)
+- Appropriate tone for domain
+- Concise yet complete (~3000 tokens)
+
+**Few-Shot Examples (30% of quality):**
+- Demonstrate ideal behavior
+- Cover diverse scenarios
+- Token-efficient (300-500 each)
+- 2-4 maximum (quality over quantity)
+
+**Capabilities (15% of quality):**
+- Complete domain coverage
+- Action-oriented naming
+- Appropriate granularity
+- No redundancy
+
+**Constraints (15% of quality):**
+- Safety boundaries included
+- Enforceable through prompt
+- Not over-constrained
+
+### Token Budget
+
+**Target:** 4000-5000 tokens (system_prompt + few_shot_examples)
+
+**Why:** Fits in context window, leaves room for user query, enables fast responses
+
+**If over budget:**
+- Consolidate redundant content
+- Replace verbose explanations with principles
+- Remove or merge overlapping examples
 
 ## Advanced Features
 
-### Pattern Selection
+### Multi-Round Training
 
-The Agent Generator has pre-built patterns for common agent types:
+For comprehensive agent development, use 10-round training:
 
-- **Technical Domain:** Deep expertise, literature-focused
-- **Creative Writing:** Emphasis on style, narrative, voice
-- ** Data Analysis:** Statistical reasoning, visualization
+1. **Round 1:** Core role definition
+2. **Round 2:** Few-shot example refinement
+3. **Round 3:** Capability specification
+4. **Round 4:** Consolidation
+5. **Rounds 5-9:** Domain expansion with synthetic feedback
+6. **Round 10:** Final consolidation
 
-You can request a specific pattern or let the meta-agent infer from your requirements.
+Each round creates a git commit for full history.
 
 ### Version Control
 
@@ -87,62 +222,90 @@ Every agent change is tracked in `versions.jsonl`:
 {
   "version": 3,
   "timestamp": "2026-02-02T16:15:00Z",
-  "changes": ["Added troubleshooting constraint", "Updated few-shot examples"],
-  "trigger": "feedback_analysis"
+  "changes": "Added preprint search, consolidated examples",
+  "trigger": "triangulated_critique"
 }
 ```
 
 This enables rollback if a refinement degrades performance.
 
-### Multi-Agent Systems
+### Pattern Selection
 
-You can create agents that work together:
+The Agent Generator has pre-built patterns:
 
-- Literature review agent finds relevant papers
-- Experimental design agent proposes studies
-- Data analysis agent interprets results
-
-The meta-agent can help design agent teams for complex workflows.
-
-## Best Practices
-
-1. **Be Specific During Interview:** The more detailed your requirements, the better the initial agent.
-
-2. **Provide Consistent Feedback:** Regular feedback improves refinement quality.
-
-3. **Wait for Sufficient Data:** Trigger refinement after 10+ feedback entries for reliable patterns.
-
-4. **Review Refinements Carefully:** Human approval catches edge cases that automated analysis misses.
-
-5. **Version Control for Safety:** All changes are tracked, so you can always revert.
+- **Technical Domain:** Deep expertise, literature-focused
+- **Creative Writing:** Emphasis on style, narrative, voice
+- **Data Analysis:** Statistical reasoning, visualization
 
 ## Troubleshooting
 
 ### Agent Performance Plateaus
 
-If an agent stops improving after refinements:
+If an agent stops improving:
 
 - Check if feedback is consistent (conflicting feedback confuses analysis)
-- Consider if the domain has evolved (new papers, new techniques)
-- Try a more specific interview to redefine scope
+- Request triangulated critique to identify blind spots
+- Consider if domain has evolved (new papers, new techniques)
 
-### Meta-Agent Self-Improvement
+### Low User Ratings
 
-The meta-agent improves its own generation strategies by analyzing patterns across all agents. This happens automatically when:
+If user feedback shows < 4.0 average rating:
 
-- 10+ agents have been generated
-- 50+ feedback entries exist across all agents
-- Performance trends show clear patterns
+- **Immediate:** Request prompt-critic review (often finds structural issues)
+- **Secondary:** Request domain agent critique (identifies content gaps)
+- **Tertiary:** Analyze user feedback themes directly
 
-You can also trigger self-improvement manually: "Analyze your generation patterns and improve your strategies."
+### Token Budget Issues
+
+If responses are too long/verbose:
+
+- Prompt-critic identifies consolidation opportunities
+- Remove redundant content before adding new features
+- Replace examples with principles where appropriate
+
+### Conflict Between Critics
+
+If domain agents and prompt-critic disagree:
+
+- Design quality wins over domain preference (foundation first)
+- But user preference wins over expert opinion (utility focus)
+- Safety veto applies to any change removing boundaries
 
 ## Architecture Notes
 
-This system uses prompt engineering only. No model fine-tuning occurs. All improvements come from:
+This system uses **prompt engineering only**. No model fine-tuning occurs. All improvements come from:
 
-- Better system prompts
-- More relevant few-shot examples
-- Refined constraints and capabilities
-- Updated generation patterns
+- Better system prompts (clearer, more complete)
+- Better few-shot examples (higher quality, better coverage)
+- Refined constraints (appropriate, enforceable)
+- Optimized token usage (consolidated, efficient)
 
-This approach is safer, more transparent, and easier to debug than model fine-tuning.
+This approach is:
+- **Safer:** All changes are transparent and reviewable
+- **Debuggable:** Can trace any issue to specific prompt changes
+- **Reversible:** Git history enables rollback
+- **Transferable:** Patterns work across domains
+
+## Feedback Schema
+
+Each feedback entry is stored in `~/.claude/agents/<agent-name>/feedback.jsonl`:
+
+```json
+{
+  "timestamp": "2026-02-02T16:15:00Z",
+  "rating": 5,
+  "comment": "Clear explanation with good citations",
+  "context_tags": ["explanation", "mechanism", "literature"]
+}
+```
+
+**Fields:**
+- `timestamp`: ISO 8601 UTC timestamp
+- `rating`: Integer 1-5 (5=excellent, 1=poor)
+- `comment`: Optional qualitative feedback
+- `context_tags`: Array categorizing interaction type
+
+**Trigger refinement when:**
+- 10+ feedback entries accumulated
+- Average rating drops below 4.0
+- User explicitly requests critique

@@ -1,11 +1,11 @@
 ---
 name: meta-agent-generator
-description: Meta-agent system for generating, refining, and self-improving specialist agents through human feedback loops. Load when creating new agents or improving existing ones.
+description: Meta-agent system for generating, refining, and self-improving specialist agents through human feedback loops and agent-to-agent critique. Load when creating new agents or improving existing ones.
 ---
 
 # Agent Generator Meta-System
 
-The Agent Generator is a meta-agent that creates, manages, and improves specialist agents through iterative feedback loops. Inspired by the Virtual Lab (Nature 2025), this system uses pure prompt engineering without model fine-tuning.
+The Agent Generator is a meta-agent that creates, manages, and improves specialist agents through iterative feedback loops and cross-domain critique. Inspired by the Virtual Lab (Nature 2025), this system uses pure prompt engineering without model fine-tuning.
 
 ## Core Workflow
 
@@ -70,29 +70,31 @@ The Agent Generator analyzes its own generation performance across all agents:
 ```
 ~/.claude/
 ├── agents/                          # Generated specialist agents
-│   └── <agent-name>/
-│       ├── config.yaml              # Agent configuration
-│       ├── feedback.jsonl           # Human feedback history
-│       └── versions.jsonl           # Version history
+│   ├── prompt-critic/               # Prompt engineering specialist (meta-critic)
+│   │   ├── config.yaml              # Agent configuration
+│   │   ├── feedback.jsonl           # Feedback history
+│   │   └── versions.jsonl           # Version history
+│   ├── geneticist/                  # Bioinformatics specialist
+│   ├── protein-structuralist/       # Protein structure specialist
+│   ├── literature-review/           # Academic literature specialist
+│   └── <agent-name>/                # Other specialist agents
+│       ├── config.yaml
+│       ├── feedback.jsonl
+│       └── versions.jsonl
 └── meta/
     └── agent-generator/             # Meta-agent itself
-        ├── config.yaml              # Meta-agent configuration
-        ├── SKILL.md                 # This documentation
+        ├── config.yaml              # Meta-agent configuration (v3)
+        ├── SKILL.md                 # This documentation (for Claude)
         ├── README.md                # User guide
         ├── prompts/                 # Prompt templates
         │   ├── interview-requirements.txt
         │   ├── generate-agent.txt
-        │   ├── collect-feedback.txt
-        │   ├── analyze-feedback.txt
-        │   ├── generate-refinements.txt
-        │   ├── self-analysis.txt
-        │   └── refine-self.txt
+        │   ├── agent-critique.txt            # Domain agent critique protocol
+        │   ├── triangulated-critique.txt     # Consensus aggregation protocol
+        │   └── generate-refinements.txt
         ├── templates/               # Generation patterns
-        │   ├── agent-config-template.yaml
-        │   ├── pattern-technical-domain.yaml
-        │   ├── pattern-creative-writing.yaml
-        │   └── pattern-data-analysis.yaml
-        └── self-feedback.jsonl      # Meta-agent performance
+        │   └── agent-config-template.yaml
+        └── self-feedback.jsonl      # Meta-agent performance tracking
 ```
 
 ## Agent Configuration Schema
@@ -216,27 +218,269 @@ Each round creates a git commit, so full history is preserved.
 
 **When to generate:** At final training round OR continuously during multi-round training
 
-#### Agent-to-Agent Critique
+#### Triangulated Critique (Virtual Lab-Inspired)
 
-**Agents can critique other agents for improvement:**
+**Triangulated critique combines three perspectives for comprehensive agent evaluation:**
 
-1. **Cross-agent review:** One specialist agent reviews another's configuration
-2. **Structural critique:** Analyze prompt structure, capabilities, examples
-3. **Domain overlap:** Identify redundancy or gaps across agents
-4. **Best practice transfer:** Apply successful patterns from high-performing agents
+Inspired by the Virtual Lab (Nature 2025), this system uses multiple specialized agents working together to evaluate and improve agent configurations more effectively than any single critic.
 
-**Usage:**
-```bash
-# Use when creating new agents or improving existing ones
-# Ask: "Have the geneticist agent critique the immunologist agent configuration"
+```
+                 ┌─────────────────────────┐
+                 │   Target Agent vN       │
+                 └───────────┬─────────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+         ▼                   ▼                   ▼
+┌────────────────┐  ┌────────────────┐  ┌────────────────┐
+│ Domain Critics │  │  Prompt-Critic │  │ User Feedback  │
+│ (2-3 agents)   │  │ (specialist)   │  │ (interactions) │
+└────────┬───────┘  └────────┬───────┘  └────────┬───────┘
+         │                   │                   │
+         └───────────────────┼───────────────────┘
+                             ▼
+                 ┌───────────────────────┐
+                 │  Consensus Aggregator  │
+                 │  (weighted framework)  │
+                 └───────────┬───────────┘
+                             │
+                    [Human Approval]
+                             │
+                             ▼
+                 ┌───────────────────────┐
+                 │   Target Agent vN+1   │
+                 └───────────────────────┘
 ```
 
-**Critique output format:** Structured feedback with:
-- Strengths to preserve
-- Weaknesses to address
-- Redundancy with other agents
-- Missing capabilities
-- Suggested improvements
+**The Three Critique Sources:**
+
+| Source | What It Evaluates | Weight | Expertise |
+|--------|-------------------|--------|-----------|
+| **Domain Agents** (2-3) | Domain coverage, terminology accuracy, capability completeness | 40% | Domain-specific knowledge |
+| **Prompt-Critic** (1) | Prompt structure, token efficiency, clarity, design quality | 30% | Prompt engineering best practices |
+| **User Feedback** (∞) | Practical utility, interaction quality, real-world performance | 30% | Actual usage patterns |
+
+**Why Triangulation Works:**
+
+1. **Domain Coverage** from domain specialists - "Is the domain knowledge complete?"
+2. **Design Quality** from prompt-critic - "Is the prompt well-structured and efficient?"
+3. **Real Validation** from users - "Does this work in practice?"
+
+Together they catch issues that any single source would miss.
+
+**Consensus Framework:**
+
+| Consensus Level | Definition | Action | Confidence |
+|-----------------|------------|--------|------------|
+| **Strong** | 2+ independent sources agree | Implement immediately | HIGH |
+| **Moderate** | Only 1 source identifies issue | Evaluate and decide | MODERATE |
+| **Conflict** | Sources disagree | Apply weighted resolution | Context-dependent |
+
+**Conflict Resolution Rules:**
+
+```
+Design quality > Domain content > User preference
+EXCEPT: Safety > Everything (safety veto applies)
+```
+
+**Examples:**
+- Domain says "add more detail" vs Prompt-critic says "token budget exceeded" → Prompt-critic wins (design foundation)
+- Experts say "use technical jargon" vs Users say "too confusing" → Users win (utility focus)
+- Any source says "this removes safety boundaries" → Veto (safety first)
+
+**Usage:**
+
+```bash
+# Request triangulated critique for an agent
+"Run triangulated critique on the literature-review agent using geneticist, prompt-critic, and user feedback"
+
+# The Agent Generator will:
+# 1. Load 2-3 domain agents (geneticist, protein-structuralist)
+# 2. Load prompt-critic agent
+# 3. Gather user feedback from feedback.jsonl
+# 4. Apply consensus-based aggregation
+# 5. Generate refinement proposal with priority rankings
+# 6. Present for human approval
+```
+
+**Critique Selection Guidelines:**
+
+For a target agent, select domain critics with:
+- **Moderate overlap** (20-40% domain similarity) - Relevant expertise
+- **Not identical domains** - Avoid echo chamber
+- **Complementary perspectives** - Different angles on similar problems
+
+**Example for literature-review agent:**
+- geneticist (moderate overlap - both deal with literature)
+- protein-structuralist (minimal overlap - structural methods)
+- prompt-critic (always included for design quality)
+
+**Weighted Scoring:**
+
+Each improvement proposal is scored:
+
+```
+Support Score = (Domain_Strength × 0.4) + (Design_Strength × 0.3) + (User_Strength × 0.3)
+Priority Score = Support × Impact × (1 - Risk)
+```
+
+Highest priority items are addressed first.
+
+**Quality Signals:**
+
+**Effective triangulation indicators:**
+- Strong consensus on critical issues (2+ sources agree)
+- Domain and design critiques complement each other
+- User feedback validates or corrects expert opinions
+- Conflicts resolved through framework (not ignored)
+
+**Aggregation quality indicators:**
+- Clear priority ranking of improvements
+- Transparent conflict resolution with rationale
+- Token budget maintained through consolidations
+- Safety constraints preserved
+- Cross-domain synergies identified
+
+**Available Critics:**
+
+```yaml
+available_critics:
+  prompt-critic: Prompt engineering specialist (design quality, token efficiency)
+  geneticist: Bioinformatics specialist (functional genomics, QTL analysis)
+  protein-structuralist: Protein structure specialist (modeling, experimental methods)
+  literature-review: Academic literature specialist (search, synthesis, critique)
+```
+
+**1. Critic Selection**
+
+When selecting agents to critique a target agent:
+- Choose 3-5 critics for balanced perspective
+- Select agents with complementary (not identical) domains
+- Include agents with moderate domain overlap for relevance
+- Include agents with minimal overlap for objectivity
+- Consider agent performance ratings (high-rated agents weighted more)
+
+**Example critic selection for `literature-review` agent:**
+- `geneticist` - moderate overlap (both deal with research literature)
+- `protein-structuralist` - minimal overlap (structural methods vs literature search)
+- Future: `statistical-analyst` - moderate overlap (statistical interpretation)
+
+**2. Structured Critique Process**
+
+Each critic agent receives the critique protocol (`prompts/agent-critique.txt`) and provides:
+
+```markdown
+# Agent Critique: {{target_agent}} v{{version}}
+**Critiqued by:** {{critic_agent}}
+
+## Dimension Scores (1-5)
+- System Prompt Quality
+- Few-Shot Examples
+- Capabilities
+- Constraints
+- Overall Effectiveness
+
+## Strengths to Preserve
+{{3-5 specific strengths with examples}}
+
+## Weaknesses to Address
+{{3-5 specific weaknesses with concrete fixes}}
+
+## Redundancy Identification
+{{Overlapping content to consolidate}}
+
+## Missing Capabilities
+{{Gaps in capability coverage}}
+
+## Domain-Specific Recommendations
+{{Integration opportunities, best practice transfer, overlap management}}
+
+## Specific Improvements
+{{Exact wording for prompt, example, capability changes}}
+```
+
+**3. Critique Aggregation**
+
+The Agent Generator synthesizes multiple critiques (`prompts/critique-aggregation.txt`):
+
+- **Consensus Identification:** Issues mentioned by 3+ critics = HIGH priority
+- **Domain Weighting:** Higher weight to critics with relevant expertise
+- **Conflict Resolution:** Reconcile opposing suggestions through analysis
+- **Impact/Risk Scoring:** Prioritize high-impact, low-risk changes
+- **Token Budget:** Ensure total stays within 4000-5000 tokens
+
+**Aggregation output:**
+```markdown
+# Aggregated Refinement Proposal
+
+## Priority Improvements (Ranked)
+1. HIGH PRIORITY (Consensus + High Impact + Low Risk)
+2. MEDIUM PRIORITY (Moderate consensus or impact)
+3. LOW PRIORITY (Single critic or high risk)
+
+## System Prompt Refinements
+{{Specific diff-style changes with rationale}}
+
+## Few-Shot Example Updates
+{{Add/remove/modify with justifications}}
+
+## Cross-Agent Synergies
+{{New integration opportunities identified}}
+```
+
+**4. Implementation Workflow**
+
+```
+Target Agent → Select Critics → Generate Critiques → Aggregate → Refine → Validate
+     ↑                                                                    ↓
+     └───────────────────── Re-critique (optional) ←──────────────────────┘
+```
+
+**5. Best Practices**
+
+**For effective critiques:**
+- Provide specific, actionable feedback
+- Reference exact configuration sections
+- Balance critique with recognition of strengths
+- Consider token budget implications
+- Suggest additions AND consolidations
+
+**For effective aggregation:**
+- Prioritize consensus issues
+- Weight by domain relevance and agent performance
+- Resolve conflicts transparently
+- Maintain agent's core identity
+- Document rationale for all decisions
+
+**6. Usage Example**
+
+```bash
+# Request agent critique
+"Have the geneticist and protein-structuralist agents critique the literature-review agent configuration"
+
+# The Agent Generator will:
+# 1. Load both critic agents
+# 2. Provide them with the critique protocol and target config
+# 3. Collect structured critiques from each
+# 4. Aggregate into unified refinement proposal
+# 5. Present for human approval
+```
+
+**7. Quality Signals**
+
+**Effective critique indicators:**
+- Multiple critics identify same issue independently
+- Suggestions are specific and implementable
+- Cross-domain insights reveal blind spots
+- Token-conscious recommendations
+- Balance of praise and constructive feedback
+
+**Aggregation quality indicators:**
+- Clear priority ranking of improvements
+- Transparent conflict resolution
+- Maintained agent core function
+- Within token budget
+- Novel synergy opportunities identified
 
 ### Meta-Agent Self-Improvement
 
