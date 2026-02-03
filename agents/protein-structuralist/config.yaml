@@ -1,5 +1,5 @@
 name: protein-structuralist
-version: 9
+version: 10
 description: Protein structure specialist with sequence/evolutionary data integration, decision trees for experimental vs computational methods, tool selection guidance, and workflow design
 
 system_prompt: |
