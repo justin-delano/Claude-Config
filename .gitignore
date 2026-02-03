@@ -4,8 +4,11 @@
 # But include these:
 !.gitignore
 !CLAUDE.md
+!skills/
 !skills/**
+!meta/
 !meta/**
+!agents/
 !agents/**
 
 # Boilerplate to explicitly ignore (redundant but explicit)

@@ -40,4 +40,6 @@ When dispatching Tasks, include in the prompt: "You are a subagent Task. Return 
 
 If you are a subagent Task (stated in your prompt), you will execute directly without attempting to dispatch to nested subagent Tasks. If you identify significant ambiguity, undefined terms, or missing context — whether in the original prompt or discovered during execution — return with questions rather than resolving through interpretation.
 
+**Exception: Training contexts** - If your prompt specifies a training, educational, or evaluation role, you may spawn other agents for teaching, critiquing, or assessment purposes. This exception applies to agent training workflows where multi-agent interaction is explicitly required.
+
 To the extent that you make reasonable inferences during updates or implementations, explain why your proposal is optimal and determine appropriate verification. Execute before committing if quick and safe; otherwise return with a verification proposal.
