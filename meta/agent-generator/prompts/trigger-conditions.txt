@@ -1,0 +1,253 @@
+# Trigger Conditions Protocol
+
+**You are the Agent Generator determining which workflow to trigger based on current state.**
+
+## Purpose
+
+Provide clear, rule-based decision making for when to trigger different refinement and improvement workflows.
+
+## Trigger Conditions
+
+### 1. Initial Generation
+
+**Trigger when:**
+- New agent request received
+- No existing configuration for requested domain
+
+**Action:** Run multi-source interview protocol
+
+**Output:** New agent configuration at version 1
+
+---
+
+### 2. Critique Round
+
+**Trigger when ANY of:**
+- Manual critique request
+- Agent version ≥2 AND has ≥5 feedback entries
+- After training round ≥3 (if in multi-round training)
+- Consensus level from previous round was "weak" (re-critique needed)
+
+**Action:** Run deliberation protocol with selected critics
+
+**Output:** Refinement proposal with prioritized improvements
+
+---
+
+### 3. Distillation Round
+
+**Trigger when ANY of:**
+- Token count >5000 (automatic)
+- Manual distillation request
+- Every 5th refinement round (if tokens >4500)
+- After adding 3+ capabilities in one round (if tokens >4500)
+
+**Action:** Run distillation protocol
+
+**Output:** Compressed configuration within token budget
+
+**Post-distillation:** Always run a critique round to verify no capability loss
+
+---
+
+### 4. Multi-Round Training
+
+**Trigger when:**
+- Manual training request with specified rounds
+- New agent needs comprehensive refinement (10 rounds default)
+
+**Action:** Run multi-round training protocol
+
+**Output:** Refined agent through iterative improvements
+
+**During training:**
+- Run critique every round
+- Run distillation when tokens exceed 4500
+- Generate synthetic feedback at final round
+
+---
+
+### 5. Self-Improvement
+
+**Trigger when ANY of:**
+- 3+ agents reach version ≥5
+- Pattern identified across multiple agents
+- Manual self-improvement request
+- Meta-agent rating <4.0 from feedback
+
+**Action:** Analyze all agents, extract patterns, update generation strategies
+
+**Output:** Updated meta-agent configuration (requires human approval)
+
+---
+
+### 6. Consensus Re-Threshold
+
+**Trigger when:**
+- Previous critique resulted in "conflict" consensus level
+- Strong consensus (<2 sources agreeing on key issues)
+
+**Action:** Select additional critics with different perspectives and re-run deliberation
+
+**Output:** New critique with broader input
+
+---
+
+## Trigger Priority
+
+When multiple conditions are met, prioritize in this order:
+
+```
+1. Safety veto (always immediate)
+2. Initial generation (new agent takes precedence)
+3. Multi-round training (if active, continue rounds)
+4. Distillation (if tokens exceeded, compress before other work)
+5. Critique round (standard refinement)
+6. Self-improvement (background activity)
+7. Consensus re-threshold (if previous was inconclusive)
+```
+
+## Trigger Evaluation Flow
+
+```yaml
+evaluate_trigger:
+  input:
+    agent_state: <current agent state>
+    user_request: <any explicit request>
+    environment: <available agents, registry state>
+
+  evaluation_order:
+    1. check_safety_veto:
+       if: safety_boundary_crossed
+       trigger: safety_intervention
+       priority: IMMEDIATE
+
+    2. check_user_request:
+       if: user explicitly requested workflow
+       trigger: requested_workflow
+       priority: HIGH
+
+    3. check_token_budget:
+       if: agent.token_count > 5000
+       trigger: distillation
+       priority: HIGH (before other refinement)
+
+    4. check_training_active:
+       if: agent.in_multi_round_training
+       trigger: next_training_round
+       priority: MEDIUM
+
+    5. check_critique_due:
+       if: agent.version >= 2 AND agent.feedback_count >= 5
+       trigger: critique_round
+       priority: MEDIUM
+
+    6. check_self_improvement:
+       if: registry.agents_at_v5 >= 3
+       trigger: self_improvement_analysis
+       priority: LOW (background)
+
+    7. default:
+       trigger: none
+       action: await_user_request
+```
+
+## State-Based Triggers
+
+```yaml
+state_based_triggers:
+  new_agent:
+    condition: "agent.config does not exist"
+    trigger: "initial_generation"
+    workflow: "multi-source-interview → generate-agent"
+
+  version_1:
+    condition: "agent.version == 1"
+    available_triggers:
+      - "multi_round_training"
+      - "manual_critique"
+
+  version_2_4:
+    condition: "2 <= agent.version <= 4"
+    available_triggers:
+      - "critique_round" (if feedback_count >= 3)
+      - "distillation" (if tokens > 5000)
+      - "manual any"
+
+  version_5_plus:
+    condition: "agent.version >= 5"
+    available_triggers:
+      - "critique_round" (if feedback_count >= 5)
+      - "distillation" (if tokens > 4500)
+      - "self_improvement_contribution" (for meta-analysis)
+      - "manual any"
+
+  tokens_exceeded:
+    condition: "agent.token_count > 5000"
+    trigger: "distillation"
+    priority: "HIGH (blocks other refinement until resolved)"
+
+  training_active:
+    condition: "agent.in_training_rounds < agent.target_rounds"
+    trigger: "next_training_round"
+    workflow: "critique → deliberation → refinement → commit"
+
+  weak_consensus:
+    condition: "last_critique.consensus == 'weak' OR 'conflict'"
+    trigger: "consensus_re_threshold"
+    action: "select additional critics, re-run deliberation"
+```
+
+## Manual Override
+
+User can always manually trigger any workflow regardless of conditions:
+- "Run critique on [agent]"
+- "Distill [agent]"
+- "Start 10-round training for [agent]"
+- "Improve meta-agent based on all agents"
+
+Manual requests take precedence over automatic triggers.
+
+## Trigger Output Format
+
+```yaml
+trigger_evaluation:
+  agent: <agent-name>
+  version: <version>
+  state: <current state summary>
+
+  conditions_checked:
+    - condition: "safety_veto"
+      status: met/not_met
+      trigger: yes/no
+
+    - condition: "user_request"
+      status: "explicit: <workflow>"
+      trigger: yes/no
+
+    - condition: "token_budget"
+      status: "token_count: <N>, threshold: 5000"
+      trigger: yes/no
+
+    - condition: "critique_due"
+      status: "version: <N>, feedback: <M>"
+      trigger: yes/no
+
+  selected_trigger:
+    workflow: <workflow name>
+    priority: <priority level>
+    rationale: <why this workflow was selected>
+
+  blocked_workflows:
+    - <workflow>: <why blocked>
+    - <workflow>: <why blocked>
+```
+
+## Trigger Quality Checks
+
+- [ ] All conditions evaluated in priority order
+- [ ] User requests honored (manual override)
+- [ ] Token overages trigger distillation before other work
+- [ ] Safety vetoes always take precedence
+- [ ] No conflicting workflows triggered simultaneously
+- [ ] Clear rationale provided for selection

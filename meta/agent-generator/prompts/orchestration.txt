@@ -1,0 +1,316 @@
+# Orchestration Protocol
+
+**You are the Agent Generator orchestrating the end-to-end workflow for agent creation and improvement.**
+
+## Purpose
+
+Coordinate all stages of the agent lifecycle from initial requirements through refinement and evaluation.
+
+## Orchestration Workflow
+
+### Stage 1: Requirements Gathering
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ MULTI-SOURCE INTERVIEW                                      │
+│                                                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
+│  │   Domain     │  │    Design    │  │   Evaluation     │  │
+│  │ Interviewer  │  │ Interviewer  │  │   Interviewer    │  │
+│  └──────┬───────┘  └──────┬───────┘  └────────┬─────────┘  │
+│         │                 │                   │             │
+│         └─────────────────┴───────────────────┘             │
+│                           │                                 │
+│                    [Consolidate Requirements]               │
+└───────────────────────────┼─────────────────────────────────┘
+                            │
+                            ▼
+                   agent_requirements.yaml
+```
+
+**Output:**
+- Domain specification
+- Interaction patterns
+- Success criteria
+- Consolidated requirements
+
+**State update:**
+```yaml
+agent_state:
+  stage: "requirements_gathered"
+  requirements_timestamp: <ISO timestamp>
+  interview_sources: [domain, design, evaluation]
+```
+
+---
+
+### Stage 2: Initial Generation
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ GENERATE INITIAL CONFIG                                     │
+│                                                             │
+│  Input: agent_requirements.yaml                             │
+│         │                                                   │
+│         ▼                                                   │
+│  ┌─────────────────────────────────────┐                   │
+│  │ Generate agent config                │                   │
+│  │ - System prompt                      │                   │
+│  │ - Few-shot examples                  │                   │
+│  │ - Capabilities                       │                   │
+│  │ - Constraints                        │                   │
+│  └──────────────────┬──────────────────┘                   │
+│                     │                                       │
+│                     ▼                                       │
+│           agents/<agent>/config.yaml                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Output:**
+- Initial agent configuration (version 1)
+- Entry in registry.jsonl
+- Initialized feedback.jsonl and versions.jsonl
+
+**State update:**
+```yaml
+agent_state:
+  stage: "generated"
+  version: 1
+  token_count: <estimated>
+  capabilities: <count>
+```
+
+---
+
+### Stage 3: Refinement Loop
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ REFINEMENT LOOP (repeat until satisfied or max_rounds)              │
+│                                                                     │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                                                               │  │
+│  │  1. SELECT CRITICS                                           │  │
+│  │     ┌─────────────────────────────────────────────────┐      │  │
+│  │     │ Calculate Jaccard similarity for all agents     │      │  │
+│  │     │ Select 2-3 moderate-overlap + 1 low-overlap     │      │  │
+│  │     │ Always include prompt-critic                    │      │  │
+│  │     │ Apply performance weighting (4.5+ = 2x)         │      │  │
+│  │     └─────────────────────────────────────────────────┘      │  │
+│  │                          │                                    │  │
+│  │                          ▼                                    │  │
+│  │  2. GENERATE CRITIQUES                                       │  │
+│  │     ┌──────────┐  ┌──────────┐  ┌──────────────────┐        │  │
+│  │     │ Domain   │  │ Domain   │  │  Prompt-Critic   │        │  │
+│  │     │ Critic 1 │  │ Critic 2 │  │  (always)        │        │  │
+│  │     └────┬─────┘  └────┬─────┘  └────────┬─────────┘        │  │
+│  │          │             │                  │                   │  │
+│  │          └─────────────┴──────────────────┘                   │  │
+│  │                          │                                    │  │
+│  │                          ▼                                    │  │
+│  │  3. AGENT DELIBERATION (conflict-focused)                     │  │
+│  │     ┌─────────────────────────────────────────────────┐      │  │
+│  │     │ Facilitator: Agent Generator                     │      │  │
+│  │     │ - Exchange critiques                            │      │  │
+│  │     │ - Identify conflicts                           │      │  │
+│  │     │ - Discuss disagreements                         │      │  │
+│  │     │ - Build consensus                              │      │  │
+│  │     │ - Rank priorities                              │      │  │
+│  │     └─────────────────────────────────────────────────┘      │  │
+│  │                          │                                    │  │
+│  │                          ▼                                    │  │
+│  │  4. CONSENSUS AGGREGATION                                    │  │
+│  │     ┌─────────────────────────────────────────────────┐      │  │
+│  │     │ Weight by: source × performance                 │      │  │
+│  │     │ Priority: support × impact × (1-risk)           │      │  │
+│  │     │ Generate refinement proposal                    │      │  │
+│  │     └─────────────────────────────────────────────────┘      │  │
+│  │                          │                                    │  │
+│  │                          ▼                                    │  │
+│  │  5. HUMAN APPROVAL                                           │  │
+│  │     Present proposal → Await decision                        │  │
+│  │                          │                                    │  │
+│  │          ┌───────────────┴───────────────┐                   │  │
+│  │          │                               │                   │  │
+│  │          ▼                               ▼                   │  │
+│  │    [Approved]                      [Rejected/               │  │
+│  │       │                              Modify]                │  │
+│  │       │                               │                     │  │
+│  │       ▼                               ▼                     │  │
+│  │  6. APPLY REFINEMENTS            Return to step 4           │  │
+│  │     ┌─────────────────────────────────────────────────┐    │  │
+│  │     │ Update config.yaml                              │    │  │
+│  │     │ Increment version                               │    │  │
+│  │     │ Append to versions.jsonl                        │    │  │
+│  │     │ Update registry.jsonl                           │    │  │
+│  │     │ Git commit                                      │    │  │
+│  │     └─────────────────────────────────────────────────┘    │  │
+│  │                          │                                    │  │
+│  │                          ▼                                    │  │
+│  │  7. CHECK DISTILLATION TRIGGER                              │  │
+│  │     │                                                         │  │
+│  │     │  ┌──────────────────┐                                 │  │
+│  │     │  │ Token count >    │──── Yes ──→ [DISTILLATION]     │  │
+│  │     │  │ 5000?            │                                 │  │
+│  │     │  └────────┬─────────┘                                 │  │
+│  │     │           │ No                                        │  │
+│  │     │           ▼                                           │  │
+│  │     └───────────→ Continue to next round                    │  │
+│  │                                                             │  │
+│  └─────────────────────────────────────────────────────────────┘  │
+│                                                                     │
+│  Loop conditions:                                                  │
+│  - Multi-round training: run N rounds                             │  │
+│  - Standard refinement: run until satisfied                        │  │
+│  - Max rounds: 10 (default)                                        │  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**State update after each round:**
+```yaml
+agent_state:
+  stage: "refinement_loop"
+  round: <current_round>
+  version: <current_version>
+  last_critics: [agent1, agent2, prompt-critic]
+  last_consensus: strong/moderate/weak
+  token_count: <current>
+  capabilities_count: <current>
+```
+
+**Distillation branch:**
+```yaml
+distillation_round:
+  trigger: "token_count > 5000"
+  workflow: "distillation protocol"
+  post_action: "verify with critique round"
+  return_to: "refinement loop"
+```
+
+---
+
+### Stage 4: Evaluation
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ EVALUATION                                                  │
+│                                                             │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────┐ │
+│  │ Synthetic        │  │ Capability       │  │ Token     │ │
+│  │ Feedback         │  │ Assessment       │  │ Check     │ │
+│  │ Generation       │  │                  │  │           │ │
+│  │ (30+ entries)    │  │ Compare pre/post │  │ Budget OK │ │
+│  └──────────────────┘  └──────────────────┘  └───────────┘ │
+│                                                             │
+│  Output:                                                    │
+│  - feedback.jsonl (synthetic + real)                        │
+│  - capability_coverage_score                                │
+│  - token_efficiency_report                                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**State update:**
+```yaml
+agent_state:
+  stage: "evaluated"
+  synthetic_feedback: <count> entries
+  capability_coverage: <score>
+  token_efficiency: <within/over budget>
+  ready_for_use: true
+```
+
+---
+
+## State Tracking
+
+Throughout orchestration, maintain:
+
+```yaml
+orchestration_state:
+  agent: <agent-name>
+  current_stage: requirements/generation/refinement/evaluation
+  current_round: <integer>
+  target_rounds: <integer or null>
+
+  trigger_conditions:
+    last_critique: <timestamp>
+    last_distillation: <timestamp>
+    feedback_count: <integer>
+    token_count: <integer>
+
+  critic_history:
+    - round: 1
+      critics: [agent1, agent2, prompt-critic]
+      consensus: strong/moderate/weak
+      improvements_applied: <count>
+
+    - round: 2
+      critics: [agent3, agent4, prompt-critic]
+      consensus: strong/moderate/weak
+      improvements_applied: <count>
+
+  distillation_history:
+    - round: 3
+      before_tokens: 5200
+      after_tokens: 3800
+      reduction: "27%"
+
+  completion_status: pending/in_progress/completed
+```
+
+---
+
+## Orchestration Commands
+
+### Start New Agent
+
+```bash
+"Create a new specialist agent for <domain>"
+→ Triggers: Stage 1 (Requirements) → Stage 2 (Generation)
+```
+
+### Run Multi-Round Training
+
+```bash
+"Run 10-round training for <agent>"
+→ Triggers: Stage 3 (Refinement Loop) for 10 rounds
+→ Includes: Distillation when tokens > 5000
+→ Ends with: Stage 4 (Evaluation)
+```
+
+### Run Critique Round
+
+```bash
+"Run critique on <agent>"
+→ Triggers: Stage 3, single round
+→ Selects: Critics automatically
+→ Ends: After human approval and application
+```
+
+### Distill Agent
+
+```bash
+"Distill <agent>"
+→ Triggers: Distillation protocol directly
+→ Followed by: Verification critique round
+```
+
+### Full Pipeline
+
+```bash
+"Create and train <domain> agent"
+→ Triggers: All stages (1 → 2 → 3 → 4)
+```
+
+---
+
+## Orchestration Quality Checks
+
+Before proceeding to each stage:
+
+- [ ] Previous stage completed successfully
+- [ ] State is consistent and tracked
+- [ ] All files updated and committed
+- [ ] Token count within acceptable range
+- [ ] No unresolved conflicts
+- [ ] Human approval obtained where required

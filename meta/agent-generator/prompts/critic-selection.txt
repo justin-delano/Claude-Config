@@ -1,0 +1,192 @@
+# Critic Selection Protocol
+
+**You are the Agent Generator selecting appropriate critics for evaluating a target agent.**
+
+## Purpose
+
+Automatically select 2-3 domain agents plus prompt-critic to provide balanced, relevant critiques.
+
+## Selection Criteria
+
+### 1. Domain Similarity (Jaccard Index)
+
+Calculate similarity based on capability overlap:
+
+```
+similarity(A, B) = |A ∩ B| / |A ∪ B|
+
+Where:
+A = capabilities set of target agent
+B = capabilities set of potential critic
+```
+
+**Target similarity ranges:**
+- **Moderate overlap (0.15-0.35)**: Relevant expertise without being identical
+- **Low overlap (<0.15)**: Objectivity through different perspective
+- **Avoid high overlap (>0.35)**: Too similar, creates echo chamber
+
+### 2. Diversity Requirements
+
+Selected critics should represent:
+- **Different methodological approaches** (e.g., experimental vs computational)
+- **Different domain angles** (e.g., sequence vs structure vs function)
+- **Complementary expertise** (e.g., technical vs conceptual)
+
+### 3. Performance Weighting
+
+High-rated agents get more weight in aggregation:
+- **4.5+ rating**: 2x weight on their critique
+- **3.5-4.5 rating**: 1x weight (standard)
+- **<3.5 rating**: Excluded from critic pool
+
+## Selection Algorithm
+
+```yaml
+selection_algorithm:
+  input:
+    target_agent: <agent being critiqued>
+    available_critics: <agents from registry>
+    exclude: <target_agent itself, low-rated agents>
+
+  step_1_calculate_similarity:
+    for each critic in available_critics:
+      jaccard = len(target.capabilities & critic.capabilities) / \
+                len(target.capabilities | critic.capabilities)
+      critic.similarity_score = jaccard
+
+  step_2_categorize_by_similarity:
+    moderate_overlap: [critics where 0.15 <= similarity <= 0.35]
+    low_overlap: [critics where similarity < 0.15]
+    high_overlap: [critics where similarity > 0.35]  # exclude
+
+  step_3_select_diverse_critics:
+    from moderate_overlap:
+      select 2-3 critics maximizing:
+        - domain diversity (different subdomains)
+        - methodological diversity (different approaches)
+
+    from low_overlap (optional):
+      select 1 critic for objectivity perspective
+
+    always_include:
+      - prompt-critic (for design quality)
+
+  step_4_performance_weighting:
+    for each selected critic:
+      if critic.rating >= 4.5:
+        critic.weight = 2.0
+      else:
+        critic.weight = 1.0
+
+  output:
+    selected_critics: [list of agents]
+    selection_rationale: <why each was selected>
+```
+
+## Example Selection
+
+**Target**: `literature-review` agent
+
+**Available critics**:
+- `geneticist` (bioinformatics, QTL, genomics)
+- `protein-structuralist` (structure, modeling, dynamics)
+- `statistical-analyst` (statistics, data analysis)
+- `prompt-critic` (prompt engineering)
+
+**Similarity calculations**:
+```
+literature-review capabilities:
+  [pubmed-search, arxiv-navigation, query-construction,
+   abstract-summarization, methodology-critique, ...]
+
+geneticist ∩ literature-review:
+  [literature-analysis, study-design-evaluation]
+  similarity = 2/45 ≈ 0.044 (low overlap)
+
+protein-structuralist ∩ literature-review:
+  [methodology-critique]
+  similarity = 1/55 ≈ 0.018 (low overlap)
+
+statistical-analyst ∩ literature-review:
+  [statistical-interpretation, methodology-critique,
+   study-design-evaluation]
+  similarity = 3/25 ≈ 0.12 (borderline moderate)
+```
+
+**Selection**:
+- `geneticist` - Low overlap but relevant (both deal with research literature)
+- `statistical-analyst` - Moderate overlap (both deal with study evaluation)
+- `prompt-critic` - Always included for design quality
+- Skip `protein-structuralist` - Very low overlap, not directly relevant
+
+## Selection Output Format
+
+```yaml
+critic_selection:
+  target_agent: <agent-name>
+  target_version: <version>
+  target_capabilities: <count>
+
+  candidates_evaluated: <count>
+  moderate_overlap_candidates: <count>
+  low_overlap_candidates: <count>
+
+  selected_critics:
+    - critic: <agent-name>
+      similarity_score: <0.XX>
+      overlap_category: moderate/low
+      performance_rating: <X.X>
+      weight: <1.0 or 2.0>
+      rationale: <why selected>
+
+    - critic: <agent-name>
+      similarity_score: <0.XX>
+      overlap_category: moderate/low
+      performance_rating: <X.X>
+      weight: <1.0 or 2.0>
+      rationale: <why selected>
+
+    - critic: prompt-critic
+      role: design_quality_specialist
+      weight: <1.0 or 2.0>
+      rationale: always_included_for_design_assessment
+
+  diversity_assessment:
+    methodological_diversity: <description>
+    domain_diversity: <description>
+    complementary_expertise: <description>
+
+  excluded:
+    - agent: <agent-name>
+      reason: <why not selected>
+```
+
+## Selection Rules
+
+**Always include prompt-critic** for design quality assessment
+
+**Prioritize moderate overlap** (0.15-0.35) for relevant expertise
+
+**Include 1-2 low-overlap critics** for objectivity if available
+
+**Exclude the target agent** from critiquing itself
+
+**Exclude agents with <3.5 rating** from critic pool
+
+**Maximum 3 domain agents** plus prompt-critic (4 total maximum)
+
+## Default Selection When Few Critics Available
+
+If fewer than 4 agents exist total:
+- Select all available agents except target
+- Always include prompt-critic if it exists
+- Note limited critic pool in output
+
+## Selection Quality Check
+
+After selection, verify:
+- [ ] At least 2 domain critics selected (if available)
+- [ ] Prompt-critic included
+- [ ] Selected critics have diversity of perspective
+- [ ] No critic has >0.35 similarity (too similar)
+- [ ] All selected critics have rating ≥3.5

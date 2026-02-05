@@ -1,8 +1,8 @@
 # Agent Generator User Guide
 
-The Agent Generator is a meta-agent system that creates and improves specialist agents through **triangulated critique**—combining domain agent feedback, prompt engineering review, and real-world user feedback.
+The Agent Generator creates specialist agents through **multi-source interviews**, **agent deliberation**, and **triangulated critique**.
 
-Inspired by the Virtual Lab (Nature 2025), this system uses pure prompt engineering without model fine-tuning to continuously improve agent quality.
+Inspired by Virtual Lab (Nature 2025), this system uses pure prompt engineering without model fine-tuning.
 
 ## Quick Start
 
@@ -12,129 +12,122 @@ To create a specialist agent, specify the domain you need:
 
 "Create an immunologist agent for explaining immune mechanisms and suggesting experiments."
 
-The Agent Generator will conduct an interview to understand:
+The Agent Generator conducts a **multi-source interview** from three perspectives:
 
-- What specific immunology topics you work with
-- What level of detail you prefer
-- What types of tasks you'll perform (literature review, experimental design, data analysis)
-- What output formats work best for you
+- **Domain Interviewer**: Expertise, terminology, workflows
+- **Design Interviewer**: Interaction patterns, output formats, constraints
+- **Evaluation Interviewer**: Success criteria, evaluation metrics
 
-After the interview, it generates an agent configuration for your approval.
+After consolidating requirements, it generates an agent configuration for your approval.
 
 ### How Agents Improve
 
-Once created, agents improve through **triangulated critique**:
+Agents improve through **deliberative refinement**:
 
 ```
-Target Agent → Domain Critics + Prompt-Critic + User Feedback → Consensus → Refinement
+Multi-Source Interview → Generation → Critic Selection → Deliberation → Consensus → Refinement
 ```
 
-| Source | What It Evaluates | Examples |
-|--------|-------------------|----------|
-| **Domain Agents** (2-3) | Domain coverage, terminology, capabilities | geneticist reviewing literature-review for genetics-specific capabilities |
-| **Prompt-Critic** (1) | Prompt structure, token efficiency, clarity | Identifying redundancies, suggesting consolidations |
-| **User Feedback** (∞) | Real-world performance, utility | Rating interactions, noting what worked/failed |
-
-**Only act on strong consensus** (2+ sources agree) for major changes.
+| Stage | What Happens |
+|-------|--------------|
+| **Critic Selection** | Auto-select 2-3 domain agents using Jaccard similarity + prompt-critic |
+| **Agent Deliberation** | Critics discuss conflicts before consensus (efficient, conflict-focused) |
+| **Consensus Aggregation** | Weight by source, performance, impact, risk |
+| **Distillation** | When tokens >5000, compress with no capability loss |
 
 ## Workflow Examples
 
-### Iterative Improvement with Triangulated Critique
+### Iterative Improvement with Deliberation
 
-**Scenario:** literature-review agent v3 has 3.8/5.0 average rating
+**Scenario**: literature-review agent v3 has 3.8/5.0 average rating
 
-**Domain Critics Say:**
-- geneticist: "Missing advanced search strategies for variant databases"
-- protein-structuralist: "No coverage of structural biology literature"
+**Critic Selection** (automatic via Jaccard similarity):
+- geneticist (moderate overlap: 0.18)
+- statistical-analyst (moderate overlap: 0.22)
+- prompt-critic (always included)
 
-**Prompt-Critic Says:**
-- "Few-shot examples too verbose (~800 tokens each, target 300-500)"
-- "Missing out-of-scope boundaries for medical advice"
+**Independent Critiques**:
+- geneticist: "Missing variant database search strategies"
+- prompt-critic: "Few-shot examples too verbose (800 tokens each, target 300-500)"
+- statistical-analyst: "Weak on meta-analysis interpretation"
 
-**User Feedback Shows:**
-- 4/5: "Great summaries, but can't find preprints efficiently"
-- 3/5: "Responses are long and detailed but sometimes miss key sources"
+**Deliberation Phase**:
+- Conflict: geneticist wants "add variant databases" vs prompt-critic says "token budget exceeded"
+- Resolution: Add variant search as principle (100 tokens) not detailed tutorial (500 tokens)
+- Priority ranking: (1) Condense examples, (2) Add variant search principles, (3) Enhance meta-analysis
 
-**Consensus Analysis:**
-- **Strong consensus:** Verbose examples (Prompt-critic + users agree)
-- **Strong consensus:** Missing preprint guidance (geneticist + users)
-- **Moderate consensus:** Structural literature gap (only protein-structuralist)
+**Consensus**:
+- Strong consensus: Verbose examples (prompt-critic + statistical-analyst)
+- Strong consensus: Variant search gap (geneticist + user feedback)
+- Moderate consensus: Meta-analysis weakness (statistical-analyst only)
 
-**Refinement Applied:**
+**Refinement Applied**:
 - Condense few-shot examples by 40% (-300 tokens)
-- Add bioRxiv/arXiv search strategies
-- Add "out-of-scope: medical advice" boundary
-- Add structural literature coverage in future round
+- Add variant database search as concise principle (+100 tokens)
+- Add meta-analysis interpretation guidance (+150 tokens)
+- Net: Token count 4200 (within 4000 target after distillation)
 
-**Result:** v4 achieves 4.6/5.0 average rating
+**Result**: v4 achieves 4.6/5.0 average rating
 
-### Creating New Agents
+### Multi-Round Training
 
-**Request:** "Create a molecular biologist agent for CRISPR experimental design."
+**Request**: "Run 10-round training for the molecular-biologist agent"
 
-**Interview Questions:**
-- What CRISPR systems do you work with? (SpCas9, base editing, prime editing?)
-- What organisms? (Mammalian cells, bacteria, plants?)
-- What deliverables? (gRNA sequences, donor templates, protocols?)
+**Orchestrated Workflow**:
+- Rounds 1-3: Core refinement with critique each round
+- Round 4: Token count at 5200 → trigger distillation
+- Round 5: Verification critique after distillation
+- Rounds 6-9: Continue refinement with synthetic feedback
+- Round 10: Final consolidation + 30+ synthetic feedback entries
 
-**Generated Agent:**
-- Specialized in your CRISPR system
-- Tailored to your organism
-- Outputs in your preferred format
+**Each round**:
+1. Auto-select critics (Jaccard similarity)
+2. Generate independent critiques
+3. Facilitate deliberation on conflicts
+4. Aggregate with weighted consensus
+5. Present proposal for approval
+6. Apply refinements and commit
 
-**After Creation:**
-- Use agent for tasks
-- Provide feedback after each interaction
-- After 10+ feedback entries, request triangulated critique
+## Deliberative Critique System
 
-### Multi-Agent Collaboration
+### Critic Selection (Automatic)
 
-Agents can work together on complex tasks:
+Uses Jaccard similarity on capability sets:
 
 ```
-Research Question → literature-review (find papers)
-                    ↓
-                 geneticist (analyze variant data)
-                    ↓
-         protein-structuralist (model protein impact)
-                    ↓
-             prompt-critic (critique any agent's performance)
+similarity(A, B) = |A ∩ B| / |A ∪ B|
 ```
 
-## Triangulated Critique System
+| Overlap Level | Range | Role |
+|---------------|-------|------|
+| Moderate | 0.15-0.35 | Relevant expertise |
+| Low | <0.15 | Objectivity perspective |
+| High | >0.35 | Excluded (echo chamber) |
 
-### How It Works
+Always include prompt-critic for design quality.
 
-1. **Collect Perspectives:**
-   - Domain agents review domain coverage
-   - Prompt-critic reviews design quality
-   - User feedback shows real-world performance
+Performance weighting: 4.5+ rating = 2x influence on consensus.
 
-2. **Build Consensus:**
-   - Strong consensus (2+ sources agree): ACT immediately
-   - Moderate consensus (1 source): EVALUATE
-   - Conflicting opinions: RESOLVE through framework
+### Deliberation Process
 
-3. **Generate Refinement:**
-   - Prioritize by support × impact × (1 - risk)
-   - Address high-priority items first
-   - Maintain token budget (4000-5000 tokens)
+Instead of simple aggregation, critics discuss:
 
-4. **Human Approval:**
-   - Review proposed changes
-   - Approve, modify, or reject
-   - Apply and increment version
+1. **Exchange critiques** - All critics see each other's feedback
+2. **Identify conflicts** - Focus on disagreements, not agreed points
+3. **Structured discussion** - Each conflict is discussed with evidence
+4. **Priority ranking** - Joint analysis of what matters most
+5. **Creative alternatives** - Neither A nor B but C solutions
 
-### Conflict Resolution
+### Consensus Framework
 
-When sources disagree:
+| Level | Definition | Action |
+|-------|------------|--------|
+| Strong | 2+ sources agree | Implement immediately |
+| Moderate | 1 source | Evaluate and decide |
+| Conflict | Sources disagree | Apply weighted resolution |
 
-| Conflict Type | Resolution |
-|---------------|------------|
-| Domain vs Design | Design quality takes precedence (foundation) |
-| User vs Experts | User preference wins (utility focus) |
-| Expert A vs Expert B | Prompt-critic breaks tie (design principles) |
-| **Any vs Safety** | **Safety always wins** (veto power) |
+**Conflict Resolution**: Design foundation > Domain content > User preference
+**Exception**: Safety veto applies (safety > everything)
 
 ### Available Critics
 
@@ -145,150 +138,124 @@ Domain Agents:
   - literature-review: Academic literature specialist
 
 Meta-Critic:
-  - prompt-critic: Prompt engineering specialist (domain-agnostic)
+  - prompt-critic: Prompt engineering specialist (always included)
 ```
+
+## Distillation
+
+When token count exceeds 5000, a dedicated distillation round runs:
+
+**Techniques**:
+1. Principle extraction - Verbose → concise principles
+2. Redundancy elimination - Merge overlapping content
+3. Structural compression - Tables, lists, DO/DON'T format
+4. Capability pruning - Remove low-value items
+5. Constraint consolidation - Merge similar constraints
+6. Few-shot optimization - Max 2 examples, remove meta-text
+
+**Verification**: Always followed by critique round to ensure no capability loss.
+
+## Usage Commands
+
+### Create New Agent
+
+```bash
+"Create a specialist agent for CRISPR experimental design"
+```
+
+Triggers: Multi-source interview → Initial generation
+
+### Run Critique Round
+
+```bash
+"Run critique on literature-review agent"
+```
+
+Triggers: Critic selection → Deliberation → Consensus → Approval
+
+### Run Multi-Round Training
+
+```bash
+"Run 10-round training for molecular-biologist agent"
+```
+
+Triggers: Full refinement loop with automatic distillation when needed
+
+### Distill Agent
+
+```bash
+"Distill protein-structuralist agent"
+```
+
+Triggers: Compression protocol → Verification critique
 
 ## Best Practices
 
-1. **Provide Specific Feedback:** "Missing X capability" is more helpful than "not good enough"
+**For agent creation**:
+- Be specific in multi-source interview about domain, use cases, evaluation criteria
+- Start with 2-3 high-quality few-shot examples
+- Target 4000 token budget from the start
 
-2. **Wait for Consensus:** Major changes require 2+ sources agreeing
+**For refinement**:
+- Let critic selection run automatically (Jaccard works well)
+- Review deliberation summary for conflict resolution rationale
+- Prioritize strong consensus items
+- Apply distillation proactively when tokens approach 5000
 
-3. **Trust User Feedback:** Practical utility matters most
-
-4. **Let Prompt-Critic Optimize:** Token efficiency and structure are their expertise
-
-5. **Domain Experts Know Content:** Trust domain agents on what should be covered
+**For critiques**:
+- Be specific and actionable
+- Reference exact configuration sections
+- Consider token budget implications
+- Balance critique with recognition of strengths
 
 ## Understanding Agent Quality
 
 ### What Makes a Good Agent?
 
-**System Prompt (40% of quality):**
-- Clear role definition
-- Specific responsibilities
-- Explicit boundaries (out-of-scope)
-- Appropriate tone for domain
-- Concise yet complete (~3000 tokens)
+**System Prompt (40%)**: Clear role, specific responsibilities, explicit boundaries, ~3000 tokens
 
-**Few-Shot Examples (30% of quality):**
-- Demonstrate ideal behavior
-- Cover diverse scenarios
-- Token-efficient (300-500 each)
-- 2-4 maximum (quality over quantity)
+**Few-Shot Examples (30%)**: Ideal behavior, diverse scenarios, 300-500 tokens each, 2-3 maximum
 
-**Capabilities (15% of quality):**
-- Complete domain coverage
-- Action-oriented naming
-- Appropriate granularity
-- No redundancy
+**Capabilities (15%)**: Complete coverage, action-oriented, appropriate granularity, no redundancy
 
-**Constraints (15% of quality):**
-- Safety boundaries included
-- Enforceable through prompt
-- Not over-constrained
+**Constraints (15%)**: Safety boundaries, enforceable, not over-constrained
 
 ### Token Budget
 
-**Target:** 4000-5000 tokens (system_prompt + few_shot_examples)
+**Target**: ~4000 tokens (system_prompt + few_shot_examples)
 
-**Why:** Fits in context window, leaves room for user query, enables fast responses
+**Trigger**: Distillation at 5000 tokens
 
-**If over budget:**
-- Consolidate redundant content
-- Replace verbose explanations with principles
-- Remove or merge overlapping examples
+**Why**: Fits in context window, leaves room for user query, enables fast responses
 
-## Advanced Features
+## Trigger Conditions
 
-### Multi-Round Training
-
-For comprehensive agent development, use 10-round training:
-
-1. **Round 1:** Core role definition
-2. **Round 2:** Few-shot example refinement
-3. **Round 3:** Capability specification
-4. **Round 4:** Consolidation
-5. **Rounds 5-9:** Domain expansion with synthetic feedback
-6. **Round 10:** Final consolidation
-
-Each round creates a git commit for full history.
-
-### Version Control
-
-Every agent change is tracked in `versions.jsonl`:
-
-```json
-{
-  "version": 3,
-  "timestamp": "2026-02-02T16:15:00Z",
-  "changes": "Added preprint search, consolidated examples",
-  "trigger": "triangulated_critique"
-}
-```
-
-This enables rollback if a refinement degrades performance.
-
-### Pattern Selection
-
-The Agent Generator has pre-built patterns:
-
-- **Technical Domain:** Deep expertise, literature-focused
-- **Creative Writing:** Emphasis on style, narrative, voice
-- **Data Analysis:** Statistical reasoning, visualization
-
-## Troubleshooting
-
-### Agent Performance Plateaus
-
-If an agent stops improving:
-
-- Check if feedback is consistent (conflicting feedback confuses analysis)
-- Request triangulated critique to identify blind spots
-- Consider if domain has evolved (new papers, new techniques)
-
-### Low User Ratings
-
-If user feedback shows < 4.0 average rating:
-
-- **Immediate:** Request prompt-critic review (often finds structural issues)
-- **Secondary:** Request domain agent critique (identifies content gaps)
-- **Tertiary:** Analyze user feedback themes directly
-
-### Token Budget Issues
-
-If responses are too long/verbose:
-
-- Prompt-critic identifies consolidation opportunities
-- Remove redundant content before adding new features
-- Replace examples with principles where appropriate
-
-### Conflict Between Critics
-
-If domain agents and prompt-critic disagree:
-
-- Design quality wins over domain preference (foundation first)
-- But user preference wins over expert opinion (utility focus)
-- Safety veto applies to any change removing boundaries
+| Workflow | Trigger |
+|----------|---------|
+| Initial generation | New agent request |
+| Critique round | Manual OR version ≥2 AND feedback ≥5 |
+| Distillation | Tokens >5000 OR manual |
+| Multi-round training | Manual with N rounds |
+| Self-improvement | 3+ agents at version ≥5 |
 
 ## Architecture Notes
 
-This system uses **prompt engineering only**. No model fine-tuning occurs. All improvements come from:
+This system uses **prompt engineering only**. All improvements come from:
 
 - Better system prompts (clearer, more complete)
 - Better few-shot examples (higher quality, better coverage)
 - Refined constraints (appropriate, enforceable)
 - Optimized token usage (consolidated, efficient)
 
-This approach is:
-- **Safer:** All changes are transparent and reviewable
-- **Debuggable:** Can trace any issue to specific prompt changes
-- **Reversible:** Git history enables rollback
-- **Transferable:** Patterns work across domains
+**Benefits**:
+- Safer: All changes transparent and reviewable
+- Debuggable: Trace issues to specific prompt changes
+- Reversible: Git history enables rollback
+- Transferable: Patterns work across domains
 
 ## Feedback Schema
 
-Each feedback entry is stored in `~/.claude/agents/<agent-name>/feedback.jsonl`:
+Each feedback entry in `~/.claude/agents/<agent-name>/feedback.jsonl`:
 
 ```json
 {
@@ -299,13 +266,4 @@ Each feedback entry is stored in `~/.claude/agents/<agent-name>/feedback.jsonl`:
 }
 ```
 
-**Fields:**
-- `timestamp`: ISO 8601 UTC timestamp
-- `rating`: Integer 1-5 (5=excellent, 1=poor)
-- `comment`: Optional qualitative feedback
-- `context_tags`: Array categorizing interaction type
-
-**Trigger refinement when:**
-- 10+ feedback entries accumulated
-- Average rating drops below 4.0
-- User explicitly requests critique
+**Trigger refinement when**: 5+ feedback entries OR rating drops below 4.0 OR manual request

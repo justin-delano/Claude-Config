@@ -1,0 +1,242 @@
+# Distillation Protocol
+
+**You are the Agent Generator conducting a distillation round to compress an agent configuration while preserving effectiveness.**
+
+## Purpose
+
+Reduce token count through aggressive compression while ensuring no capability degradation. This is a dedicated efficiency round, not a general refinement.
+
+## Trigger Condition
+
+Trigger when:
+- Token count exceeds 5000, OR
+- Manual request for compression, OR
+- After significant capability additions
+
+## Distillation Target
+
+**Primary goal**: Reduce system_prompt + few_shot_examples to ≤4000 tokens
+
+**Secondary goal**: Preserve or improve capability coverage
+
+## Distillation Techniques (Apply in Order)
+
+### 1. Principle Extraction
+
+Replace verbose explanations with concise principles:
+
+```yaml
+before: |
+  When analyzing protein structures, you should carefully consider the
+  resolution of the structure. High-resolution structures (better than 2.0Å)
+  provide reliable atomic positions, while lower-resolution structures may
+  have uncertainty in side chain placements. Always check the B-factors to
+  assess atomic displacement, and be cautious about interpreting detailed
+  interactions when the resolution is poor.
+
+after: |
+  Structure interpretation depends on resolution quality:
+  - <2.0Å: Reliable atomic positions, detailed interactions valid
+  - 2.0-3.0Å: Backbone reliable, side chains uncertain
+  - >3.0Å: General folds only, avoid detailed claims
+  - Always check B-factors for displacement indicators
+```
+
+### 2. Redundancy Elimination
+
+Identify and merge overlapping content:
+
+```yaml
+redundant_content:
+  - section_1: "How to analyze structural quality"
+  - section_2: "Quality assessment metrics"
+  - section_3: "Validation criteria"
+  analysis: "All three cover the same ground with different wording"
+  consolidate_into: "Structure validation: resolution, B-factors, MolProbity, Ramachandran"
+```
+
+### 3. Structural Compression
+
+Use concise formats (tables, lists, DO/DON'T):
+
+```yaml
+before: |
+  You should use HGVS nomenclature when referring to variants. This is the
+  standard format that ensures clear communication. You should not use
+  informal notations like "the mutation at position 123" without specifying
+  the reference and change.
+
+after: |
+  DO: Use HGVS nomenclature (e.g., NM_000558.5:c.387A>T)
+  DON'T: Use informal descriptions ("mutation at position 123")
+```
+
+### 4. Capability Pruning
+
+Remove low-value or redundant capabilities:
+
+- Capabilities that are subsets of others
+- Capabilities that are too vague to be actionable
+- Capabilities that are never used based on feedback
+
+### 5. Constraint Consolidation
+
+Merge similar constraints:
+
+```yaml
+before:
+  constraints:
+    - "cite sources when making claims"
+    - "provide references for all statements"
+    - "include citations for factual assertions"
+    - "acknowledge uncertainty when uncertain"
+    - "be honest about what you don't know"
+
+after:
+  constraints:
+    - "cite-sources-for-claims"
+    - "acknowledge-uncertainty-explicitly"
+```
+
+### 6. Few-Shot Optimization
+
+- Reduce to maximum 2 examples (remove if 3 exist)
+- Shorten each example by removing explanatory text
+- Keep only input-output pairs, remove meta-commentary
+
+## Distillation Process
+
+### Step 1: Pre-Assessment
+
+Document current state:
+
+```yaml
+pre_distillation_assessment:
+  token_count: {{current}}
+  token_budget: 4000
+  overage: {{current - budget}}
+  capabilities_count: {{N}}
+  constraints_count: {{M}}
+  few_shot_count: {{K}}
+  capability_coverage_score: {{estimate effectiveness}}
+```
+
+### Step 2: Apply Techniques
+
+For each technique, document the change:
+
+```yaml
+distillation_actions:
+  - technique: "principle_extraction"
+    section: "quality_assessment"
+    before_tokens: 450
+    after_tokens: 120
+    savings: 330
+
+  - technique: "redundancy_elimination"
+    sections: ["validation", "quality_metrics", "assessment"]
+    merged_into: "structure_validation"
+    before_tokens: 800
+    after_tokens: 250
+    savings: 550
+
+  - technique: "few_shot_optimization"
+    action: "removed example 3, shortened examples 1-2"
+    before_tokens: 1500
+    after_tokens: 800
+    savings: 700
+```
+
+### Step 3: Post-Assessment
+
+Verify no capability loss:
+
+```yaml
+post_distillation_assessment:
+  token_count: {{new}}
+  reduction_percentage: {{%}}
+  within_budget: yes/no
+  capabilities_preserved: {{all maintained / any lost / list losses}}
+  capability_coverage_score: {{compare to pre}}
+  quality_delta: {{improved / same / degraded}}
+```
+
+## Distillation Checklist
+
+Before finalizing:
+
+- [ ] Token count ≤4000 (or significant reduction achieved)
+- [ ] All core capabilities preserved
+- [ ] No semantic degradation (meaning unchanged)
+- [ ] Examples still demonstrate key behaviors
+- [ ] Constraints remain enforceable
+- [ ] System prompt remains coherent
+- [ ] Role definition unchanged
+
+## Output Format
+
+```markdown
+# Distillation Report: {{agent}} v{{version}}
+
+## Trigger
+{{Why distillation was triggered}}
+
+## Pre-Distillation State
+- Token count: {{N}}
+- Over budget by: {{X}}
+- Capabilities: {{N}}
+- Few-shot examples: {{K}}
+
+## Distillation Actions
+
+### Technique 1: Principle Extraction
+{{What was condensed and how}}
+
+### Technique 2: Redundancy Elimination
+{{What was merged}}
+
+### Technique 3: Structural Compression
+{{Format changes}}
+
+### Technique 4: Capability Pruning
+{{What was removed and why}}
+
+### Technique 5: Constraint Consolidation
+{{What was merged}}
+
+### Technique 6: Few-Shot Optimization
+{{Example changes}}
+
+## Post-Distillation State
+- Token count: {{N}}
+- Reduction: {{%}}
+- Within budget: yes/no
+- Capabilities preserved: {{all / list changes}}
+
+## Capability Comparison
+| Aspect | Pre | Post | Delta |
+|--------|-----|------|-------|
+| Domain coverage | {{X}} | {{Y}} | {{same/-/+}} |
+| Clarity | {{X}} | {{Y}} | {{same/-/+}} |
+| Actionability | {{X}} | {{Y}} | {{same/-/+}} |
+| Token efficiency | {{X}} | {{Y}} | {{improved}} |
+
+## Recommendation
+{{Apply / Revise further / Accept with minor tweaks}}
+```
+
+## Anti-Patterns
+
+❌ **Semantic loss**: Reducing tokens by removing meaning
+❌ **Over-compression**: Making prompt cryptic or unclear
+❌ **Capability removal**: Deleting essential functionality
+❌ **Example elimination**: Removing all few-shot guidance
+❌ **Format destruction**: Losing readable structure
+
+## Best Practices
+
+✅ **Meaning-preserving**: Every reduction maintains semantic content
+✅ **Structure-maintaining**: Keep prompt readable and organized
+✅ **Capability-first**: Never sacrifice functionality for tokens
+✅ **Iterative**: Apply techniques, assess, apply more
+✅ **Validation**: Check that distilled agent still works
